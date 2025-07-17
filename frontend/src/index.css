@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* In your global CSS file (e.g., index.css) */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scrollbar if content slightly overflows */
+}
+
+@keyframes slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -2000px 0;
+  }
+}
+
+.animate-slide {
+  animation: slide 5s linear infinite;
+}

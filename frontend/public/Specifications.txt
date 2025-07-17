@@ -1,0 +1,12 @@
+Colors Used for elements:
+    Green - #2F855A 
+    Yellow - #FBBF24
+    Blue - #3B82F6
+    Red - #F87171
+
+Colors used for Linear Gradient: 
+    #A7F3D0 , #FFFFFF
+    #2F855A, #3B82F6
+
+
+
