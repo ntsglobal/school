@@ -16,6 +16,8 @@ import OnBoardingScreen3 from './pages/OnBoardingPage/OnBoardingScreen3';
 import LandingPage from './pages/LandingPage/LandingPage.jsx';
 import Contact from './pages/ContactPage/Contact.jsx';
 import About from './pages/AboutPage/About.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicyPage/PrivacyPolicy';
+
 
 function App() {
   return (
@@ -31,7 +33,7 @@ function App() {
             </div>
           }
         />
-        {/* ✅ Role Selection Page shown first */}
+        {/* Role Selection Page shown first */}
         <Route path="/role-selection" element={
           <div>
           <RoleSelectionPage />
@@ -57,14 +59,30 @@ function App() {
         {/* Forgot Password Page Route */} 
         <Route path="/forgot-password" element={
           <div>
+          <Navbar />
           <ForgotPassword />
           <Footer />
           </div>} />
 
         {/* Onboarding Page  */}
-        <Route path="/onboarding/step1" element={<OnBoardingScreen1 />} />
-        <Route path="/onboarding/step2" element={<OnBoardingScreen2 />} />
-        <Route path="/onboarding/step3" element={<OnBoardingScreen3 />} />
+        <Route path="/onboarding/step1" element={
+          <div>
+          <Navbar />
+          <OnBoardingScreen1 />
+          <Footer />
+          </div>} />
+        <Route path="/onboarding/step2" element={
+          <div>
+          <Navbar />
+          <OnBoardingScreen2 />
+          <Footer />
+          </div>} />
+        <Route path="/onboarding/step3" element={
+          <div>
+          <Navbar />
+          <OnBoardingScreen3 />
+          <Footer />
+          </div>} />
 
         {/* Contact Page */}
         <Route path="/contact" element={
@@ -78,6 +96,13 @@ function App() {
           <div>
             <Navbar />
             <About />
+            <Footer />
+          </div>} />
+
+        <Route path="/privacy-policy" element={
+          <div>
+            <Navbar />
+            <PrivacyPolicy />
             <Footer />
           </div>} />
       </Routes>

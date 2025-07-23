@@ -48,7 +48,7 @@ function Footer() {
               <ul className="space-y-1 text-gray-300">
                 <li><a href="#">Help Center</a></li>
                 <li><a href="#">Terms</a></li>
-                <li><a href="#">Privacy</a></li>
+                <li><a href="/privacy-policy">Privacy</a></li>
                 <li><a href="#">Contact</a></li>
               </ul>
             </div>
