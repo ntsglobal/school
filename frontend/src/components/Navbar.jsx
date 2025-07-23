@@ -2,7 +2,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 
 function Navbar() {
   const location = useLocation();
-  const isMinimal = ["/login", "/signup"].includes(location.pathname);
+  const isMinimal = ["/login", "/signup","/forgot-password"].includes(location.pathname);
 
   return (
     <nav className="flex justify-between items-center px-6 py-4 bg-white shadow-md">

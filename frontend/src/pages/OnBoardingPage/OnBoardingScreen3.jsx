@@ -70,7 +70,7 @@ const OnBoardingScreen3 = () => {
             className={`cursor-pointer border rounded-lg p-6 text-center shadow-sm transition-all duration-200 ${
               selectedGoal === goal.key
                 ? `${goal.color} border-2`
-                : "border-yellow-300"
+                : "border-green-300"
             }`}
           >
             <FaClock className={`mx-auto mb-2 text-2xl ${goal.color}`} />
