@@ -1,5 +1,7 @@
-// src/pages/AboutUsPage/About.import React from 'react';
+// src/pages/AboutUsPage/About.jsx
+import React from 'react';
 import { FaBookOpen, FaBrain, FaTrophy, FaTwitter, FaLinkedinIn, FaChartBar, FaGlobe, FaClipboardCheck } from 'react-icons/fa';
+import './About.css';
 
 // --- Import your logo here ---
 // Adjust the path based on where About.jsx is relative to your assets folder
@@ -59,7 +61,7 @@ const curriculumFeatures = [
 // --- Main Page Component ---
 function About() {
   return (
-    <div className="bg-white">
+    <div className="about-page">
       <main>
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-green-50 to-white text-center py-20 px-4">
