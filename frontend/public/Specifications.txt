@@ -6,7 +6,7 @@ Colors Used for elements:
 
 Colors used for Linear Gradient: 
     #A7F3D0 , #FFFFFF
-    #2F855A, #3B82F6
+    #2F855A , #3B82F6
 
 
 

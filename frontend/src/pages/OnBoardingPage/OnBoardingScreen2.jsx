@@ -7,28 +7,16 @@ const levels = [
     id: "A1",
     title: "A1 - Beginner",
     desc: "Just starting out",
-    border: "border-yellow-400",
-    bg: "bg-yellow-50",
-    dot: "bg-yellow-400",
-    hover: "hover:bg-yellow-100",
   },
   {
     id: "A2",
     title: "A2 - Elementary",
     desc: "Basic communication",
-    border: "border-yellow-500",
-    bg: "bg-yellow-50",
-    dot: "bg-yellow-500",
-    hover: "hover:bg-yellow-100",
   },
   {
     id: "B1",
     title: "B1 - Intermediate",
     desc: "Everyday conversation",
-    border: "border-red-400",
-    bg: "bg-red-50",
-    dot: "bg-red-400",
-    hover: "hover:bg-red-100",
   },
 ];
 
@@ -38,7 +26,7 @@ const OnBoardingScreen2 = () => {
 
   const handleSelect = (levelId) => {
     setSelectedLevel(levelId);
-    localStorage.setItem("languageLevel", levelId); // Store for future use
+    localStorage.setItem("languageLevel", levelId);
   };
 
   const handleContinue = () => {
@@ -51,7 +39,7 @@ const OnBoardingScreen2 = () => {
     <div className="min-h-screen flex flex-col bg-white px-6 md:px-12 py-10">
       {/* Top bar */}
       <div className="flex justify-between items-center mb-6">
-        <p className="text-green-600 text-sm">Step 2 of 3</p>
+        <p className="text-green-600 text-sm font-medium">Step 2 of 3</p>
         <div className="flex gap-2">
           <div className="w-8 h-2 bg-green-600 rounded-full"></div>
           <div className="w-8 h-2 bg-green-600 rounded-full"></div>
@@ -61,7 +49,6 @@ const OnBoardingScreen2 = () => {
 
       {/* Content */}
       <div className="w-full max-w-3xl mx-auto text-center">
-        <div className="text-4xl mb-4">🈯</div>
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
           Choose Your Language Level
         </h2>
@@ -77,14 +64,13 @@ const OnBoardingScreen2 = () => {
               <div
                 key={level.id}
                 onClick={() => handleSelect(level.id)}
-                className={`flex justify-between items-center px-5 py-4 rounded-xl shadow-sm cursor-pointer transition ${
-                  level.bg
-                } ${level.border} ${level.hover} ${
-                  isActive ? "ring-2 ring-green-500" : ""
-                }`}
+                className={`flex justify-between items-center px-5 py-4 rounded-xl shadow-sm cursor-pointer transition 
+                  border border-green-500 bg-green-50 hover:bg-green-100 
+                  ${isActive ? "ring-2 ring-green-600" : ""}
+                `}
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-4 h-4 rounded-full ${level.dot}`}></div>
+                  <div className={`w-4 h-4 rounded-full bg-green-500`}></div>
                   <div className="text-left">
                     <div className="font-semibold">{level.title}</div>
                     <div className="text-sm text-gray-600">{level.desc}</div>
