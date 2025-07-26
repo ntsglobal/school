@@ -272,6 +272,17 @@ function App() {
             </div>
           </ProtectedRoute>
         } />
+
+        {/* Pricing Page (alias for Premium) */}
+        <Route path="/pricing" element={
+          <ProtectedRoute>
+            <div>
+              <Navbar />
+              <PremiumPage />
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
       </Routes>
     </AuthProvider>
   );
