@@ -4,10 +4,9 @@ import { FaBookOpen, FaBrain, FaTrophy, FaTwitter, FaLinkedinIn, FaChartBar, FaG
 import './About.css';
 
 // --- Import your logo here ---
-// Adjust the path based on where About.jsx is relative to your assets folder
-// Assuming src/pages/AboutUsPage/About.jsx and src/assets/logo.svg,
-// you need to go up two directories (..) then into assets/
-//import PartnerLogo from '../../assets/logo.svg'; 
+// Using the available NTS Green School logo from public folder
+// Since it's in public folder, we can reference it directly
+const PartnerLogo = '/images/NTS_Green_School.png'; 
 
 // --- Placeholder Data ---
 const leadershipData = [
@@ -60,16 +59,28 @@ const curriculumFeatures = [
 
 // --- Main Page Component ---
 function About() {
+  console.log('About component is rendering');
+  
   return (
-    <div className="about-page">
+    <div className="about-page" style={{minHeight: '100vh', backgroundColor: 'white'}}>
+      {/* Simple test content */}
+      <div style={{padding: '20px', textAlign: 'center', backgroundColor: '#f0f9ff'}}>
+        <h1 style={{fontSize: '2rem', color: '#1f2937', marginBottom: '1rem'}}>
+          About NTS Green School
+        </h1>
+        <p style={{fontSize: '1.125rem', color: '#4b5563'}}>
+          This is the About page content. If you can see this, the component is working!
+        </p>
+      </div>
+      
       <main>
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-green-50 to-white text-center py-20 px-4">
-          <div className="max-w-4xl mx-auto"> {/* Ensures content has "space in between two sides" and is centered */}
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
+        <section className="bg-gradient-to-br from-green-50 to-white text-center py-20 px-4" style={{backgroundColor: '#f0f9ff', padding: '80px 16px'}}>
+          <div className="max-w-4xl mx-auto" style={{maxWidth: '56rem', margin: '0 auto'}}> {/* Ensures content has "space in between two sides" and is centered */}
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4" style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem'}}>
               Empowering Education for Tomorrow's Leaders
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 mb-8" style={{fontSize: '1.125rem', color: '#4b5563', marginBottom: '2rem'}}>
               Transforming learning through innovative curriculum and global partnerships.
             </p>
           </div>
