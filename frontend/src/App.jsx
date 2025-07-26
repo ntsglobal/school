@@ -225,11 +225,7 @@ function App() {
         {/* Community Page */}
         <Route path="/community" element={
           <ProtectedRoute>
-            <div>
-              <Navbar />
-              <Community />
-              <Footer />
-            </div>
+            <Community />
           </ProtectedRoute>
         } />
 
