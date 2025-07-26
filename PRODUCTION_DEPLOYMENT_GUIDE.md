@@ -252,7 +252,7 @@ Create `.env.production`:
 VITE_API_BASE_URL=https://your-api-domain.com/api
 
 # Firebase Configuration (Public - OK to expose)
-VITE_FIREBASE_API_KEY=AIzaSyBjcjXY3gGBqF36zQ6jtRs1gRmvf4Rv23M
+VITE_FIREBASE_API_KEY=AIzaSyBjcjXY3gGBqF36zQ6jtRs1gDmvf4Rv23M
 VITE_FIREBASE_AUTH_DOMAIN=ntsschool-ab557.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=ntsschool-ab557
 VITE_FIREBASE_STORAGE_BUCKET=ntsschool-ab557.firebasestorage.app
