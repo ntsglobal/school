@@ -1,4 +1,4 @@
-import react from 'react';
+import React from 'react';
 import Hero from './Hero';
 import Features from './Features';
 import AvailableLanguages from "./AvailableLanguages";

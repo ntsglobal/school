@@ -37,6 +37,8 @@ const Login = () => {
   // Helper function to determine redirect URL based on user role
   const getRedirectUrl = (userRole) => {
     switch (userRole) {
+      case 'admin':
+        return '/admin-dashboard';
       case 'teacher':
         return '/teacher-dashboard';
       case 'student':
