@@ -25,6 +25,7 @@ import AssessmentDashboard from './pages/AssessmentDashboard/AssessmentDashboard
 import ParentPortal from './pages/ParentPortal/ParentPortal.jsx';
 import GamificationDashboard from './pages/GamificationDashboard/GamificationDashboard.jsx';
 import StudentDashboard from './pages/StudentDashboard/StudentDashboard.jsx';
+import TeacherDashboard from './pages/TeacherDashboard/TeacherDashboard.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicyPage/PrivacyPolicy';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage.jsx';
 import LanguageSelectionPage from './pages/LanguageSelectionPage/LanguageSelectionPage.jsx';
@@ -183,6 +184,13 @@ function App() {
         <Route path="/student-dashboard" element={
           <ProtectedRoute>
             <StudentDashboard />
+          </ProtectedRoute>
+        } />
+
+        {/* Teacher Dashboard */}
+        <Route path="/teacher-dashboard" element={
+          <ProtectedRoute>
+            <TeacherDashboard />
           </ProtectedRoute>
         } />
 
