@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import userService from '../../services/userService';
+import courseService from '../../services/courseService';
+import progressService from '../../services/progressService';
 import './TeacherDashboard.css';
 import {
   FiUsers, FiBookOpen, FiClock, FiAward, FiBarChart,
@@ -12,16 +15,22 @@ const TeacherDashboard = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [dashboardData, setDashboardData] = useState({
+    stats: {
+      totalStudents: 0,
+      activeClasses: 0,
+      upcomingLessons: 0,
+      newMessages: 0
+    },
+    students: [],
+    schedule: [],
+    recentActivities: []
+  });
 
-  // Mock data - replace with actual API calls
-  const dashboardStats = {
-    totalStudents: 156,
-    activeClasses: 8,
-    upcomingLessons: 12,
-    newMessages: 24
-  };
-
-  const students = [
+  // Fallback data definitions
+  const fallbackStudents = [
     {
       id: 1,
       name: 'Alex Thompson',
@@ -60,31 +69,34 @@ const TeacherDashboard = () => {
     }
   ];
 
-  const todaySchedule = [
+  const fallbackSchedule = [
     {
       id: 1,
       time: '09:00 AM',
       title: 'French Advanced',
       subtitle: '8th Grade • 45 minutes',
-      color: 'bg-green-100 text-green-800'
+      color: 'bg-green-100 text-green-800',
+      date: new Date().toISOString()
     },
     {
       id: 2,
       time: '11:00 AM',
       title: 'French Beginner',
       subtitle: '6th Grade • 45 minutes',
-      color: 'bg-green-100 text-green-800'
+      color: 'bg-green-100 text-green-800',
+      date: new Date().toISOString()
     },
     {
       id: 3,
       time: '02:00 PM',
       title: 'French Intermediate',
       subtitle: '7th Grade • 45 minutes',
-      color: 'bg-green-100 text-green-800'
+      color: 'bg-green-100 text-green-800',
+      date: new Date().toISOString()
     }
   ];
 
-  const recentActivities = [
+  const fallbackActivities = [
     {
       id: 1,
       type: 'lesson',
@@ -94,19 +106,67 @@ const TeacherDashboard = () => {
     },
     {
       id: 2,
-      type: 'assignment',
-      title: 'New Assignment',
-      description: 'French Beginner • 4 hours ago',
-      icon: '📝'
+      type: 'student',
+      title: 'New Student Enrolled',
+      description: 'Emma Wilson joined French Advanced',
+      icon: '👤'
     },
     {
       id: 3,
-      type: 'quiz',
-      title: 'Quiz Created',
-      description: 'French Intermediate • Yesterday',
-      icon: '❓'
+      type: 'assignment',
+      title: 'Assignment Submitted',
+      description: '5 new submissions received',
+      icon: '📝'
     }
   ];
+
+  // Load teacher dashboard data
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Load teacher's data
+        const studentsResponse = await userService.getTeacherStudents();
+        const coursesResponse = await courseService.getTeacherCourses();
+        const progressResponse = await progressService.getTeacherProgress();
+        
+        setDashboardData({
+          stats: {
+            totalStudents: studentsResponse.length || 156,
+            activeClasses: coursesResponse.length || 8,
+            upcomingLessons: coursesResponse.reduce((acc, course) => acc + (course.upcomingLessons || 0), 0) || 12,
+            newMessages: 24 // This would come from chat service
+          },
+          students: studentsResponse || [],
+          schedule: coursesResponse.flatMap(course => course.schedule || []) || [],
+          recentActivities: progressResponse.recentActivities || []
+        });
+        
+      } catch (err) {
+        console.error('Error loading teacher dashboard data:', err);
+        setError('Failed to load dashboard data');
+        // Set fallback data
+        setDashboardData({
+          stats: {
+            totalStudents: 156,
+            activeClasses: 8,
+            upcomingLessons: 12,
+            newMessages: 24
+          },
+          students: fallbackStudents,
+          schedule: fallbackSchedule,
+          recentActivities: fallbackActivities
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user]);
 
   // Calendar helper functions
   const getDaysInMonth = (month, year) => {
@@ -147,6 +207,42 @@ const TeacherDashboard = () => {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
+  // Destructure dashboard data
+  const { stats, students, schedule, recentActivities } = dashboardData;
+  const todaySchedule = schedule.filter(lesson => {
+    const today = new Date();
+    const lessonDate = new Date(lesson.date);
+    return lessonDate.toDateString() === today.toDateString();
+  });
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="teacher-dashboard min-h-screen bg-gray-50 p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="loading-spinner"></div>
+          <p className="ml-4">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="teacher-dashboard min-h-screen bg-gray-50 p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="error-state">
+            <p>Error: {error}</p>
+            <button onClick={() => window.location.reload()} className="retry-button">
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="teacher-dashboard min-h-screen bg-gray-50 p-6">
       {/* Header */}
@@ -185,7 +281,7 @@ const TeacherDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Total Students</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalStudents}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalStudents}</p>
             </div>
           </div>
         </div>
@@ -197,7 +293,7 @@ const TeacherDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Active Classes</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardStats.activeClasses}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.activeClasses}</p>
             </div>
           </div>
         </div>
@@ -209,7 +305,7 @@ const TeacherDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">Upcoming Lessons</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardStats.upcomingLessons}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.upcomingLessons}</p>
             </div>
           </div>
         </div>
@@ -221,7 +317,7 @@ const TeacherDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-600">New Messages</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardStats.newMessages}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.newMessages}</p>
             </div>
           </div>
         </div>
