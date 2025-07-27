@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
   getUserProgress,
+  getCurrentUserProgress,
   getCourseProgress,
   getLessonProgress,
   updateProgress,
@@ -16,6 +17,7 @@ import {
 const router = express.Router();
 
 // User progress routes
+router.get('/user/me', verifyFirebaseAuth, getCurrentUserProgress);
 router.get('/user/:userId', verifyFirebaseAuth, canAccessStudentData, getUserProgress);
 router.get('/user/:userId/course/:courseId', verifyFirebaseAuth, canAccessStudentData, getCourseProgress);
 router.get('/user/:userId/lesson/:lessonId', verifyFirebaseAuth, canAccessStudentData, getLessonProgress);

@@ -35,7 +35,7 @@ export const getUserProgress = async (req, res) => {
 
     // Get detailed progress by course
     const progressByCourse = await Progress.aggregate([
-      { $match: { userId: mongoose.Types.ObjectId(userId) } },
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
       {
         $lookup: {
           from: 'courses',
@@ -118,6 +118,26 @@ export const getUserProgress = async (req, res) => {
 
   } catch (error) {
     console.error('Get user progress error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
+// Get current user's own progress (convenience method)
+export const getCurrentUserProgress = async (req, res) => {
+  try {
+    const userId = req.user.id; // Get user ID from the authenticated user
+    
+    // Reuse the existing getUserProgress logic by setting req.params
+    req.params.userId = userId;
+    
+    // Call the existing getUserProgress function
+    return getUserProgress(req, res);
+    
+  } catch (error) {
+    console.error('Get current user progress error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'

@@ -28,12 +28,12 @@ const StudentDashboard = () => {
         setLoading(true);
         
         // Load user progress data
-        const progressResponse = await progressService.getUserProgress();
-        const coursesResponse = await courseService.getUserEnrolledCourses();
-        const userStatsResponse = await userService.getUserStats();
+        const progressResponse = await progressService.getCurrentUserProgress();
+        const coursesResponse = await courseService.getUserCourses();
+        // Note: User stats endpoint doesn't exist yet, using fallback data
         
         setDashboardData({
-          weeklyProgress: progressResponse.weeklyProgress || [
+          weeklyProgress: progressResponse.data?.weeklyProgress || [
             { day: 'Mon', value: 85 },
             { day: 'Tue', value: 70 },
             { day: 'Wed', value: 95 },
@@ -42,15 +42,15 @@ const StudentDashboard = () => {
             { day: 'Sat', value: 75 },
             { day: 'Sun', value: 90 }
           ],
-          monthlyAchievements: progressResponse.monthlyAchievements || [
+          monthlyAchievements: progressResponse.data?.monthlyAchievements || [
             { language: 'Japanese', progress: 75, color: '#10b981' },
             { language: 'French', progress: 60, color: '#3b82f6' },
             { language: 'Spanish', progress: 45, color: '#f59e0b' }
           ],
-          recentAchievements: progressResponse.recentAchievements || [],
-          upcomingClasses: coursesResponse.upcomingClasses || [],
-          currentStreak: userStatsResponse.currentStreak || 0,
-          totalPoints: userStatsResponse.totalPoints || 0
+          recentAchievements: progressResponse.data?.recentActivity || [],
+          upcomingClasses: coursesResponse.data?.courses || [],
+          currentStreak: progressResponse.data?.streakData?.currentStreak || 0,
+          totalPoints: progressResponse.data?.overallStats?.totalPoints || 0
         });
         
       } catch (err) {

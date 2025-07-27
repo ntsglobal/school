@@ -11,7 +11,9 @@ import {
   getUserLiveClasses,
   getUpcomingClasses,
   joinVideoCall,
-  leaveVideoCall
+  leaveVideoCall,
+  startLiveClass,
+  endLiveClass
 } from '../controllers/liveClassController.js';
 import { 
   verifyFirebaseAuth, 
@@ -34,6 +36,10 @@ router.post('/:id/leave', verifyFirebaseAuth, leaveLiveClass);
 // Video call endpoints
 router.post('/:id/video/join', verifyFirebaseAuth, joinVideoCall);
 router.post('/:id/video/leave', verifyFirebaseAuth, leaveVideoCall);
+
+// Class control endpoints (Teacher/Admin only)
+router.post('/:id/start', verifyFirebaseAuth, isTeacherOrAdmin, startLiveClass);
+router.post('/:id/end', verifyFirebaseAuth, isTeacherOrAdmin, endLiveClass);
 
 // Teacher/Admin routes
 router.post('/', verifyFirebaseAuth, isTeacherOrAdmin, [

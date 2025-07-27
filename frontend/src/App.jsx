@@ -33,11 +33,15 @@ import LanguageSelectionPage from './pages/LanguageSelectionPage/LanguageSelecti
 import RecordedClasses from './pages/RecordedClasses/RecordedClasses.jsx';
 import HelpCenter from './pages/HelpCenter/HelpCenter.jsx';
 import Community from './pages/Community/Community.jsx';
+import NewDiscussion from './pages/Community/NewDiscussion.jsx';
 import CoursesPage from './pages/CoursesPage/CoursesPage.jsx';
 import AILanguageLab from './pages/AILanguageLab/AILanguageLab.jsx';
 import CultureExploration from './pages/CultureExploration/CultureExploration.jsx';
 import LanguageBuddyPage from './pages/LanguageBuddyPage.jsx';
 import PremiumPage from './pages/PremiumPage/PremiumPage.jsx';
+import LiveClassVideoRoom from './components/LiveClassVideoRoom.jsx';
+import LiveClassesPage from './pages/LiveClassesPage/LiveClassesPage.jsx';
+import LiveClassDetailPage from './pages/LiveClassDetailPage/LiveClassDetailPage.jsx';
 
 
 function App() {
@@ -245,6 +249,13 @@ function App() {
           </ProtectedRoute>
         } />
 
+        {/* New Discussion Page */}
+        <Route path="/community/new-discussion" element={
+          <ProtectedRoute>
+            <NewDiscussion />
+          </ProtectedRoute>
+        } />
+
         {/* Language Buddy Finder Page */}
         <Route path="/buddy-finder" element={
           <ProtectedRoute>
@@ -275,6 +286,27 @@ function App() {
               <CultureExploration />
               <Footer />
             </div>
+          </ProtectedRoute>
+        } />
+
+        {/* Live Classes Page */}
+        <Route path="/live-classes" element={
+          <ProtectedRoute>
+            <LiveClassesPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Live Class Detail Page */}
+        <Route path="/live-classes/:id" element={
+          <ProtectedRoute>
+            <LiveClassDetailPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Live Class Video Room */}
+        <Route path="/live-classes/:id/video" element={
+          <ProtectedRoute>
+            <LiveClassVideoRoom />
           </ProtectedRoute>
         } />
 

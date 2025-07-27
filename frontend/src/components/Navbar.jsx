@@ -19,6 +19,7 @@ function Navbar() {
             {[
               { label: "Home", path: "/" },
               { label: "Courses", path: "/courses" },
+              { label: "Live Classes", path: "/live-classes" },
               { label: "Pricing", path: "/premium" },
               { label: "About", path: "/about" },
               { label: "Contact", path: "/contact" },
