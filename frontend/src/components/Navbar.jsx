@@ -19,7 +19,8 @@ function Navbar() {
             {[
               { label: "Home", path: "/" },
               { label: "Courses", path: "/courses" },
-              { label: "Pricing", path: "/pricing" },
+              { label: "Live Classes", path: "/live-classes" },
+              { label: "Pricing", path: "/premium" },
               { label: "About", path: "/about" },
               { label: "Contact", path: "/contact" },
               { label: "Community", path: "/community" }

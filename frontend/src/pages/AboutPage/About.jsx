@@ -1,11 +1,12 @@
-// src/pages/AboutUsPage/About.import React from 'react';
+// src/pages/AboutUsPage/About.jsx
+import React from 'react';
 import { FaBookOpen, FaBrain, FaTrophy, FaTwitter, FaLinkedinIn, FaChartBar, FaGlobe, FaClipboardCheck } from 'react-icons/fa';
+import './About.css';
 
 // --- Import your logo here ---
-// Adjust the path based on where About.jsx is relative to your assets folder
-// Assuming src/pages/AboutUsPage/About.jsx and src/assets/logo.svg,
-// you need to go up two directories (..) then into assets/
-//import PartnerLogo from '../../assets/logo.svg'; 
+// Using the available NTS Green School logo from public folder
+// Since it's in public folder, we can reference it directly
+const PartnerLogo = '/images/NTS_Green_School.png'; 
 
 // --- Placeholder Data ---
 const leadershipData = [
@@ -58,16 +59,19 @@ const curriculumFeatures = [
 
 // --- Main Page Component ---
 function About() {
+  console.log('About component is rendering');
+  
   return (
-    <div className="bg-white">
+    <div className="about-page" style={{minHeight: '100vh', backgroundColor: 'white'}}>
+      
       <main>
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-green-50 to-white text-center py-20 px-4">
-          <div className="max-w-4xl mx-auto"> {/* Ensures content has "space in between two sides" and is centered */}
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
+              <section className="text-center py-12 bg-gradient-to-b from-[#A7F3D0] to-[#FFFFFF]" style={{backgroundColor: '#f0f9ff', padding: '80px 16px'}}>
+          <div className="max-w-4xl mx-auto" style={{maxWidth: '56rem', margin: '0 auto'}}> {/* Ensures content has "space in between two sides" and is centered */}
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4" style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem'}}>
               Empowering Education for Tomorrow's Leaders
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 mb-8" style={{fontSize: '1.125rem', color: '#4b5563', marginBottom: '2rem'}}>
               Transforming learning through innovative curriculum and global partnerships.
             </p>
           </div>
@@ -213,7 +217,7 @@ function About() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-green-600 to-teal-500 text-white">
+        <section className="bg-gradient-to-r from-[#2F855A] to-[#3B82F6] py-12 px-4">
           <div className="container mx-auto px-6 py-16 text-center">
             <h2 className="text-4xl font-bold mb-4">Join Our Educational Journey</h2>
             <p className="text-lg mb-8">Start learning with NTS Green School today and unlock your potential.</p>

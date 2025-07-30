@@ -1,15 +1,187 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import firebaseAuth from "../../services/firebaseAuth";
 
 const year = new Date().getFullYear();
 
 const Login = () => {
   const [role, setRole] = useState("student");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    rememberMe: false
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleRoleChange = (selectedRole) => {
     setRole(selectedRole);
     localStorage.setItem("userRole", selectedRole); // Save role for backend use
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  // Helper function to determine redirect URL based on user role
+  const getRedirectUrl = (userRole) => {
+    switch (userRole) {
+      case 'admin':
+        return '/admin-dashboard';
+      case 'teacher':
+        return '/teacher-dashboard';
+      case 'student':
+        return '/student-dashboard';
+      case 'parent':
+        return '/parent-portal';
+      default:
+        return '/onboarding/step1'; // Fallback for undefined roles
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const loginData = {
+        ...formData,
+        role: role
+      };
+      
+      const result = await login(loginData);
+      
+      // Get user role from the login result or from context
+      const userRole = result?.role || role || formData.role;
+      const redirectUrl = getRedirectUrl(userRole);
+      
+      navigate(redirectUrl);
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setIsLoading(true);
+
+    try {
+      // Sign in with Google using Firebase
+      const firebaseUser = await firebaseAuth.signInWithGoogle();
+      
+      // Get Firebase ID token
+      const firebaseToken = await firebaseUser.getIdToken();
+
+      // Send Firebase token to our backend for login
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firebaseToken: firebaseToken,
+          email: firebaseUser.email
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Save user data and redirect
+        localStorage.setItem('userData', JSON.stringify(data.data.user));
+        localStorage.setItem('authToken', data.data.token);
+        
+        // Get user role from the response and redirect accordingly
+        const userRole = data.data.user?.role;
+        const redirectUrl = getRedirectUrl(userRole);
+        
+        navigate(redirectUrl);
+      } else {
+        throw new Error(data.message || 'Login failed');
+      }
+    } catch (err) {
+      // If user doesn't exist, redirect to signup
+      if (err.message?.includes('User not found') || err.message?.includes('not found')) {
+        setError("No account found. Redirecting to sign up...");
+        setTimeout(() => navigate("/signup"), 2000);
+      } else {
+        setError(err.message || "Google sign-in failed. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setError("");
+    setIsLoading(true);
+
+    try {
+      // Sign in with Facebook using Firebase
+      const firebaseUser = await firebaseAuth.signInWithFacebook();
+      
+      // Get Firebase ID token
+      const firebaseToken = await firebaseUser.getIdToken();
+
+      // Send token to our backend for verification and user data
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firebaseToken: firebaseToken
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Store user data and token
+        localStorage.setItem('userData', JSON.stringify(data.data.user));
+        localStorage.setItem('authToken', data.data.token);
+        
+        // Get user role from the response and redirect accordingly
+        const userRole = data.data.user?.role;
+        const redirectUrl = getRedirectUrl(userRole);
+        
+        navigate(redirectUrl);
+      } else {
+        throw new Error(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Facebook sign-in error:', err);
+      
+      // Handle specific Facebook auth errors
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        setError('An account already exists with the same email address but different sign-in credentials. Please use the original sign-in method.');
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        setError('Sign-in was cancelled. Please try again.');
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('Popup was blocked by your browser. Please allow popups for this site and try again.');
+      } else if (err.message?.includes('User not found') || err.message?.includes('not found')) {
+        setError("No account found. Redirecting to sign up...");
+        setTimeout(() => navigate("/signup"), 2000);
+      } else {
+        setError(err.message || "Facebook sign-in failed. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -83,11 +255,22 @@ const Login = () => {
           {/* Form */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-4">Welcome Back</h2>
-            <div className="space-y-4">
+            
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   placeholder="Enter your email"
+                  required
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
                 <HiOutlineMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -96,25 +279,40 @@ const Login = () => {
               <div className="relative">
                 <input
                   type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
                   placeholder="Enter your password"
+                  required
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
                 />
                 <HiOutlineLockClosed className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
-            </div>
 
-            <div className="flex justify-between items-center mt-2 text-sm">
-              <label className="flex items-center gap-1">
-                <input type="checkbox" className="form-checkbox" /> Remember me
-              </label>
-              <a href="/forgot-password" className="text-blue-500 hover:underline">
-                Forgot Password?
-              </a>
-            </div>
+              <div className="flex justify-between items-center text-sm">
+                <label className="flex items-center gap-1">
+                  <input 
+                    type="checkbox" 
+                    name="rememberMe"
+                    checked={formData.rememberMe}
+                    onChange={handleInputChange}
+                    className="form-checkbox" 
+                  /> 
+                  Remember me
+                </label>
+                <Link to="/forgot-password" className="text-blue-500 hover:underline">
+                  Forgot Password?
+                </Link>
+              </div>
 
-            <button className="mt-4 w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700">
-              Sign In
-            </button>
+              <button 
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
+              </button>
+            </form>
 
             <div className="my-4 flex items-center">
               <hr className="flex-grow border-gray-300" />
@@ -122,8 +320,22 @@ const Login = () => {
               <hr className="flex-grow border-gray-300" />
             </div>
 
-            <button className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-md hover:bg-gray-50 gap-2">
-              <FcGoogle className="text-xl" /> Sign in with Google
+            <button 
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-md hover:bg-gray-50 gap-2 mb-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FcGoogle className="text-xl" /> 
+              {isLoading ? "Signing in..." : "Sign in with Google"}
+            </button>
+
+            <button 
+              onClick={handleFacebookSignIn}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center border border-gray-300 py-2 rounded-md hover:bg-blue-50 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FaFacebook className="text-blue-600 text-xl" /> 
+              {isLoading ? "Signing in..." : "Sign in with Facebook"}
             </button>
 
             <p className="text-center text-sm text-gray-600 mt-6">
