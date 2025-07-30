@@ -63,19 +63,10 @@ function About() {
   
   return (
     <div className="about-page" style={{minHeight: '100vh', backgroundColor: 'white'}}>
-      {/* Simple test content */}
-      <div style={{padding: '20px', textAlign: 'center', backgroundColor: '#f0f9ff'}}>
-        <h1 style={{fontSize: '2rem', color: '#1f2937', marginBottom: '1rem'}}>
-          About NTS Green School
-        </h1>
-        <p style={{fontSize: '1.125rem', color: '#4b5563'}}>
-          This is the About page content. If you can see this, the component is working!
-        </p>
-      </div>
       
       <main>
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-green-50 to-white text-center py-20 px-4" style={{backgroundColor: '#f0f9ff', padding: '80px 16px'}}>
+              <section className="text-center py-12 bg-gradient-to-b from-[#A7F3D0] to-[#FFFFFF]" style={{backgroundColor: '#f0f9ff', padding: '80px 16px'}}>
           <div className="max-w-4xl mx-auto" style={{maxWidth: '56rem', margin: '0 auto'}}> {/* Ensures content has "space in between two sides" and is centered */}
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4" style={{fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '1rem'}}>
               Empowering Education for Tomorrow's Leaders
@@ -226,7 +217,7 @@ function About() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-green-600 to-teal-500 text-white">
+        <section className="bg-gradient-to-r from-[#2F855A] to-[#3B82F6] py-12 px-4">
           <div className="container mx-auto px-6 py-16 text-center">
             <h2 className="text-4xl font-bold mb-4">Join Our Educational Journey</h2>
             <p className="text-lg mb-8">Start learning with NTS Green School today and unlock your potential.</p>

@@ -6,6 +6,18 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import firebaseAuth from "../../services/firebaseAuth";
 import Footer from "../../components/Footer";
+import studentBlack from "../../assets/icons/student-black.png";
+import studentWhite from "../../assets/icons/student-white.png";
+import parentBlack from "../../assets/icons/parent-black.png";
+import parentWhite from "../../assets/icons/parent-white.png";
+import teacherBlack from "../../assets/icons/teacher-black.png";
+import teacherWhite from "../../assets/icons/teacher-white.png";
+
+const roles = [
+  { id: "student", label: "Student", iconBlack: studentBlack, iconWhite: studentWhite },
+  { id: "parent", label: "Parent", iconBlack: parentBlack, iconWhite: parentWhite },
+  { id: "teacher", label: "Teacher", iconBlack: teacherBlack, iconWhite: teacherWhite }
+];
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -216,26 +228,51 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Main content */}
-      <div className="flex flex-col md:flex-row justify-center items-start md:items-center flex-grow px-4 pt-16 pb-10 gap-10 max-w-7xl mx-auto">
-        {/* Left Form Section */}
-        <div className="w-full max-w-md">
-          <h2 className="text-green-600 text-2xl md:text-3xl font-bold mb-1">
-            Join NTS Green School
-          </h2>
-          <p className="text-gray-600 mb-6">Start your multilingual journey with us</p>
+  <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col md:flex-row justify-center items-start md:items-center flex-grow px-4 pt-16 pb-10 gap-10 max-w-7xl mx-auto">
+      {/* Left Form Section */}
+      <div className="w-full max-w-md">
+        <h2 className="text-[#2F855A] text-2xl font-bold mb-1">Join NTS Green School</h2>
+        <p className="text-gray-600 mb-6">Start your educational journey with us</p>
 
-          <h3 className="text-orange-500 font-semibold text-lg mb-4">
-            Create Your Account
-          </h3>
+        {/* Error */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
-          )}
+        {/* Role Selection (Icon buttons like your version) */}
+        <div className="flex gap-2 mb-6">
+          {roles.map((role) => {
+            const isSelected = formData.role === role.id;
+            return (
+              <button
+                key={role.id}
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, role: role.id }))
+                }
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md border font-semibold text-sm transition ${
+                  isSelected
+                    ? "bg-[#2F855A] text-white"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                <img
+                  src={isSelected ? role.iconWhite : role.iconBlack}
+                  alt={role.label}
+                  className="h-5 w-5"
+                />
+                {role.label}
+              </button>
+            );
+          })}
+        </div>
 
+        {/* Form Box */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-[#2F855A] font-semibold text-lg mb-4">Create Your Account</h3>
           <form onSubmit={handleSubmit}>
             <div className="flex gap-4 mb-4">
               <input
@@ -278,20 +315,8 @@ const SignUp = () => {
               className="w-full border rounded px-3 py-2 text-sm mb-4"
             />
 
-            {/* Role Selection */}
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-              className="w-full border rounded px-3 py-2 text-sm mb-4"
-            >
-              <option value="student">Student</option>
-              <option value="parent">Parent</option>
-              <option value="teacher">Teacher</option>
-            </select>
-
             {/* Conditional fields for students */}
-            {formData.role === 'student' && (
+            {formData.role === "student" && (
               <>
                 <select
                   name="grade"
@@ -344,10 +369,10 @@ const SignUp = () => {
               className="w-full border rounded px-3 py-2 text-sm mb-6"
             />
 
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-green-600 text-white py-2 rounded font-semibold mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#2F855A] text-white py-2 rounded font-semibold mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Creating Account..." : "Sign Up"}
             </button>
@@ -355,21 +380,21 @@ const SignUp = () => {
 
           <div className="text-center text-sm text-gray-500 mb-4">or</div>
 
-          <button 
+          <button
             onClick={handleGoogleSignUp}
             disabled={isLoading}
             className="w-full flex items-center justify-center gap-2 border rounded py-2 text-sm font-medium mb-3 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FcGoogle className="text-lg" /> 
+            <FcGoogle className="text-lg" />
             {isLoading ? "Signing up..." : "Sign up with Google"}
           </button>
 
-          <button 
+          <button
             onClick={handleFacebookSignUp}
             disabled={isLoading}
             className="w-full flex items-center justify-center gap-2 border rounded py-2 text-sm font-medium mb-3 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FaFacebook className="text-blue-600 text-lg" /> 
+            <FaFacebook className="text-blue-600 text-lg" />
             {isLoading ? "Signing up..." : "Sign up with Facebook"}
           </button>
 
@@ -380,65 +405,71 @@ const SignUp = () => {
             </a>
           </p>
         </div>
+      </div>
 
-        {/* Right Benefits Section */}
-        <div className="bg-orange-50 rounded-xl p-6 w-full max-w-md">
-          <h4 className="text-green-700 font-semibold text-lg mb-4">
-            Why Choose NTS Green School?
-          </h4>
+      {/* Right Info Section */}
+      <div className="bg-blue-50 rounded-xl p-6 w-full max-w-md">
+        <h4 className="text-[#2F855A] font-semibold text-lg mb-4">
+          Why Choose NTS Green School?
+        </h4>
 
-          <ul className="space-y-3 text-left text-sm text-gray-700 mb-6">
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500">🎓</span>
-              <div>
-                <strong>Quality Education</strong>
-                <br /> Excellence in teaching and learning
-              </div>
+        <ul className="space-y-4 text-left text-sm text-gray-700 mb-6">
+          <li className="flex items-start gap-3">
+            <img src="/images/icons/graduation-cap.png" alt="Education" className="h-5 w-5 mt-1" />
+            <div>
+              <strong>Quality Education</strong>
+              <br />
+              Excellence in teaching and learning
+            </div>
+          </li>
+          <li className="flex items-start gap-3">
+            <img src="/images/icons/book.png" alt="Curriculum" className="h-5 w-5 mt-1" />
+            <div>
+              <strong>Modern Curriculum</strong>
+              <br />
+              Updated and comprehensive programs
+            </div>
+          </li>
+          <li className="flex items-start gap-3">
+            <img src="/images/icons/community.png" alt="Community" className="h-5 w-5 mt-1" />
+            <div>
+              <strong>Supportive Community</strong>
+              <br />
+              Strong network of students and teachers
+            </div>
+          </li>
+          <li className="flex items-start gap-3">
+            <img src="/images/icons/faculty.png" alt="Faculty" className="h-5 w-5 mt-1" />
+            <div>
+              <strong>Expert Faculty</strong>
+              <br />
+              Highly qualified and experienced teachers
+            </div>
+          </li>
+        </ul>
+
+        <div className="bg-white rounded-lg p-4 shadow">
+          <h5 className="text-sm font-semibold mb-2">Additional Benefits</h5>
+          <ul className="space-y-2 text-gray-700 text-sm">
+            <li className="flex items-center gap-2">
+              <FaCheckCircle className="text-[#2F855A]" /> Free study materials
             </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500">📘</span>
-              <div>
-                <strong>Modern Curriculum</strong>
-                <br /> Updated and comprehensive programs
-              </div>
+            <li className="flex items-center gap-2">
+              <FaCheckCircle className="text-[#2F855A]" /> Regular assessments
             </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500">🤝</span>
-              <div>
-                <strong>Supportive Community</strong>
-                <br /> Strong network of students and teachers
-              </div>
+            <li className="flex items-center gap-2">
+              <FaCheckCircle className="text-[#2F855A]" /> Career guidance
             </li>
-            <li className="flex items-start gap-2">
-              <span className="text-orange-500">👩‍🏫</span>
-              <div>
-                <strong>Expert Faculty</strong>
-                <br /> Highly qualified and experienced teachers
-              </div>
+            <li className="flex items-center gap-2">
+              <FaCheckCircle className="text-[#2F855A]" /> Parent-teacher meetings
             </li>
           </ul>
-
-          <div className="bg-white rounded-lg p-4 shadow">
-            <h5 className="text-sm font-semibold mb-2">Additional Benefits</h5>
-            <ul className="space-y-2 text-gray-700 text-sm">
-              <li className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-500" /> Free study materials
-              </li>
-              <li className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-500" /> Regular assessments
-              </li>
-              <li className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-500" /> Career guidance
-              </li>
-              <li className="flex items-center gap-2">
-                <FaCheckCircle className="text-green-500" /> Parent-teacher meetings
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default SignUp;

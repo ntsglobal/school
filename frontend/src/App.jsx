@@ -71,14 +71,16 @@ function App() {
         {/* Login/Register Page Route */}
         <Route path="/login" element={
           <div>
+            <Navbar />
             <Login />
             <Footer />
           </div>
         } />
 
-        {/* Sign In Page Route */}
+        {/* Sign Up Page Route */}
         <Route path="/signup" element={ 
           <div>
+            <Navbar />
             <SignUp />
             <Footer />
           </div>

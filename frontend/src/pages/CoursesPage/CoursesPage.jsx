@@ -106,11 +106,11 @@ const CoursesPage = () => {
   ];
 
   const categories = [
-    { id: 'all', name: 'All Courses', icon: '📚' },
-    { id: 'general', name: 'General Courses', icon: '🎯' },
-    { id: 'elementary', name: 'Elementary Courses', icon: '📖' },
-    { id: 'intermediate', name: 'Intermediate Courses', icon: '📈' },
-    { id: 'advanced', name: 'Advanced Courses', icon: '🎓' }
+    { id: 'all', name: 'All Courses', icon: '/images/icons/book.png' },
+    { id: 'general', name: 'General Courses', icon: '/images/icons/knowledge.png' },
+    { id: 'elementary', name: 'Elementary Courses', icon: '/images/icons/book.png' },
+    { id: 'intermediate', name: 'Intermediate Courses', icon: '/images/icons/faculty.png' },
+    { id: 'advanced', name: 'Advanced Courses', icon: '/images/icons/graduation-cap.png' }
   ];
 
   useEffect(() => {
@@ -321,7 +321,7 @@ const CoursesPage = () => {
                 className="category-card"
                 onClick={() => setSelectedCategory(category.id)}
               >
-                <div className="category-icon">{category.icon}</div>
+                <img src={category.icon} alt={category.name} className="category-icon-img" />
                 <h3 className="category-name">{category.name}</h3>
                 <p className="category-description">
                   {category.id === 'general' && 'Perfect for those starting their English learning journey'}
@@ -339,28 +339,29 @@ const CoursesPage = () => {
       </section>
 
       {/* Newsletter Section */}
-      <section className="newsletter-section">
-        <div className="container">
-          <div className="newsletter-content">
-            <h2>Stay Updated with New Courses</h2>
-            <p>Subscribe to our newsletter and get notified about new courses, special offers, and learning tips.</p>
-            
-            <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
-              <div className="input-group">
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <button type="submit" className="btn-primary">
-                  Subscribe
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      <section className="bg-gradient-to-r from-[#2F855A] to-[#3B82F6] text-white py-12 px-4 text-center">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-xl font-semibold mb-4">Stay Updated with New Courses</h2>
+          <p className="mb-6">
+            Subscribe to our newsletter and get notified about new courses, special offers, and learning tips.
+          </p>
+        <form className="flex flex-col sm:flex-row justify-center gap-3" onSubmit={handleNewsletterSubmit}>
+        <input
+          type="email"
+          placeholder="Enter your email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="px-4 py-2 rounded-full text-black w-full sm:w-auto"
+        />
+          <button
+            type="submit"
+            className="bg-yellow-400 px-6 py-2 rounded-full font-medium hover:bg-yellow-500 transition"
+            >
+            Subscribe
+          </button>
+        </form>
+      </div>
       </section>
     </div>
   );
