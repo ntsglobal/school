@@ -25,17 +25,23 @@ import AssessmentDashboard from './pages/AssessmentDashboard/AssessmentDashboard
 import ParentPortal from './pages/ParentPortal/ParentPortal.jsx';
 import GamificationDashboard from './pages/GamificationDashboard/GamificationDashboard.jsx';
 import StudentDashboard from './pages/StudentDashboard/StudentDashboard.jsx';
+import TeacherDashboard from './pages/TeacherDashboard/TeacherDashboard.jsx';
+import AdminDashboard from './pages/AdminDashboard/AdminDashboard.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicyPage/PrivacyPolicy';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage/PrivacyPolicyPage.jsx';
 import LanguageSelectionPage from './pages/LanguageSelectionPage/LanguageSelectionPage.jsx';
 import RecordedClasses from './pages/RecordedClasses/RecordedClasses.jsx';
 import HelpCenter from './pages/HelpCenter/HelpCenter.jsx';
 import Community from './pages/Community/Community.jsx';
+import NewDiscussion from './pages/Community/NewDiscussion.jsx';
 import CoursesPage from './pages/CoursesPage/CoursesPage.jsx';
 import AILanguageLab from './pages/AILanguageLab/AILanguageLab.jsx';
 import CultureExploration from './pages/CultureExploration/CultureExploration.jsx';
 import LanguageBuddyPage from './pages/LanguageBuddyPage.jsx';
 import PremiumPage from './pages/PremiumPage/PremiumPage.jsx';
+import LiveClassVideoRoom from './components/LiveClassVideoRoom.jsx';
+import LiveClassesPage from './pages/LiveClassesPage/LiveClassesPage.jsx';
+import LiveClassDetailPage from './pages/LiveClassDetailPage/LiveClassDetailPage.jsx';
 
 
 function App() {
@@ -186,6 +192,20 @@ function App() {
           </ProtectedRoute>
         } />
 
+        {/* Teacher Dashboard */}
+        <Route path="/teacher-dashboard" element={
+          <ProtectedRoute>
+            <TeacherDashboard />
+          </ProtectedRoute>
+        } />
+
+        {/* Admin Dashboard */}
+        <Route path="/admin-dashboard" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+
         {/* Gamification Dashboard */}
         <Route path="/gamification" element={
           <ProtectedRoute>
@@ -225,11 +245,14 @@ function App() {
         {/* Community Page */}
         <Route path="/community" element={
           <ProtectedRoute>
-            <div>
-              <Navbar />
-              <Community />
-              <Footer />
-            </div>
+            <Community />
+          </ProtectedRoute>
+        } />
+
+        {/* New Discussion Page */}
+        <Route path="/community/new-discussion" element={
+          <ProtectedRoute>
+            <NewDiscussion />
           </ProtectedRoute>
         } />
 
@@ -266,8 +289,40 @@ function App() {
           </ProtectedRoute>
         } />
 
+        {/* Live Classes Page */}
+        <Route path="/live-classes" element={
+          <ProtectedRoute>
+            <LiveClassesPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Live Class Detail Page */}
+        <Route path="/live-classes/:id" element={
+          <ProtectedRoute>
+            <LiveClassDetailPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Live Class Video Room */}
+        <Route path="/live-classes/:id/video" element={
+          <ProtectedRoute>
+            <LiveClassVideoRoom />
+          </ProtectedRoute>
+        } />
+
         {/* Premium Page */}
         <Route path="/premium" element={
+          <ProtectedRoute>
+            <div>
+              <Navbar />
+              <PremiumPage />
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+
+        {/* Pricing Page (alias for Premium) */}
+        <Route path="/pricing" element={
           <ProtectedRoute>
             <div>
               <Navbar />

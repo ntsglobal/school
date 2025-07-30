@@ -34,6 +34,22 @@ const Login = () => {
     }));
   };
 
+  // Helper function to determine redirect URL based on user role
+  const getRedirectUrl = (userRole) => {
+    switch (userRole) {
+      case 'admin':
+        return '/admin-dashboard';
+      case 'teacher':
+        return '/teacher-dashboard';
+      case 'student':
+        return '/student-dashboard';
+      case 'parent':
+        return '/parent-portal';
+      default:
+        return '/onboarding/step1'; // Fallback for undefined roles
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -45,8 +61,13 @@ const Login = () => {
         role: role
       };
       
-      await login(loginData);
-      navigate("/onboarding/step1"); // Redirect to onboarding after successful login
+      const result = await login(loginData);
+      
+      // Get user role from the login result or from context
+      const userRole = result?.role || role || formData.role;
+      const redirectUrl = getRedirectUrl(userRole);
+      
+      navigate(redirectUrl);
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
     } finally {
@@ -83,7 +104,12 @@ const Login = () => {
         // Save user data and redirect
         localStorage.setItem('userData', JSON.stringify(data.data.user));
         localStorage.setItem('authToken', data.data.token);
-        navigate("/onboarding/step1");
+        
+        // Get user role from the response and redirect accordingly
+        const userRole = data.data.user?.role;
+        const redirectUrl = getRedirectUrl(userRole);
+        
+        navigate(redirectUrl);
       } else {
         throw new Error(data.message || 'Login failed');
       }
@@ -129,15 +155,11 @@ const Login = () => {
         localStorage.setItem('userData', JSON.stringify(data.data.user));
         localStorage.setItem('authToken', data.data.token);
         
-        // Navigate to appropriate dashboard
-        const userRole = data.data.user.role;
-        if (userRole === 'student') {
-          navigate("/student-dashboard");
-        } else if (userRole === 'parent') {
-          navigate("/parent-portal");
-        } else {
-          navigate("/"); // Default navigation
-        }
+        // Get user role from the response and redirect accordingly
+        const userRole = data.data.user?.role;
+        const redirectUrl = getRedirectUrl(userRole);
+        
+        navigate(redirectUrl);
       } else {
         throw new Error(data.message || 'Login failed');
       }

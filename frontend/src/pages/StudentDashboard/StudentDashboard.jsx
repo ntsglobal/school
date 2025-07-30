@@ -1,27 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaFire, FaCalendar, FaPlay, FaUsers, FaTrophy, FaBook, FaChartLine, FaGraduationCap } from 'react-icons/fa';
+import { useAuth } from '../../contexts/AuthContext';
+import courseService from '../../services/courseService';
+import progressService from '../../services/progressService';
+import userService from '../../services/userService';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import './StudentDashboard.css';
 
 const StudentDashboard = () => {
-  const weeklyProgress = [
-    { day: 'Mon', value: 85 },
-    { day: 'Tue', value: 70 },
-    { day: 'Wed', value: 95 },
-    { day: 'Thu', value: 60 },
-    { day: 'Fri', value: 80 },
-    { day: 'Sat', value: 75 },
-    { day: 'Sun', value: 90 }
-  ];
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [dashboardData, setDashboardData] = useState({
+    weeklyProgress: [],
+    monthlyAchievements: [],
+    recentAchievements: [], 
+    upcomingClasses: [],
+    currentStreak: 0,
+    totalPoints: 0
+  });
 
-  const monthlyAchievements = [
-    { language: 'Japanese', progress: 75, color: '#10b981' },
-    { language: 'French', progress: 60, color: '#3b82f6' },
-    { language: 'Spanish', progress: 45, color: '#f59e0b' }
-  ];
+  // Load dashboard data from APIs
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Load user progress data
+        const progressResponse = await progressService.getCurrentUserProgress();
+        const coursesResponse = await courseService.getUserCourses();
+        // Note: User stats endpoint doesn't exist yet, using fallback data
+        
+        setDashboardData({
+          weeklyProgress: progressResponse.data?.weeklyProgress || [
+            { day: 'Mon', value: 85 },
+            { day: 'Tue', value: 70 },
+            { day: 'Wed', value: 95 },
+            { day: 'Thu', value: 60 },
+            { day: 'Fri', value: 80 },
+            { day: 'Sat', value: 75 },
+            { day: 'Sun', value: 90 }
+          ],
+          monthlyAchievements: progressResponse.data?.monthlyAchievements || [
+            { language: 'Japanese', progress: 75, color: '#10b981' },
+            { language: 'French', progress: 60, color: '#3b82f6' },
+            { language: 'Spanish', progress: 45, color: '#f59e0b' }
+          ],
+          recentAchievements: progressResponse.data?.recentActivity || [],
+          upcomingClasses: coursesResponse.data?.courses || [],
+          currentStreak: progressResponse.data?.streakData?.currentStreak || 0,
+          totalPoints: progressResponse.data?.overallStats?.totalPoints || 0
+        });
+        
+      } catch (err) {
+        console.error('Error loading dashboard data:', err);
+        setError('Failed to load dashboard data');
+        // Set fallback mock data
+        setDashboardData({
+          weeklyProgress: [
+            { day: 'Mon', value: 85 },
+            { day: 'Tue', value: 70 },
+            { day: 'Wed', value: 95 },
+            { day: 'Thu', value: 60 },
+            { day: 'Fri', value: 80 },
+            { day: 'Sat', value: 75 },
+            { day: 'Sun', value: 90 }
+          ],
+          monthlyAchievements: [
+            { language: 'Japanese', progress: 75, color: '#10b981' },
+            { language: 'French', progress: 60, color: '#3b82f6' },
+            { language: 'Spanish', progress: 45, color: '#f59e0b' }
+          ],
+          recentAchievements: [],
+          upcomingClasses: [],
+          currentStreak: 7,
+          totalPoints: 1250
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const recentAchievements = [
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user]);
+
+  const { weeklyProgress, monthlyAchievements, recentAchievements, upcomingClasses, currentStreak, totalPoints } = dashboardData;
+
+  // Fallback achievements if none from API
+  const fallbackAchievements = [
     {
       id: 1,
       title: 'Japanese Basics',
@@ -44,6 +113,8 @@ const StudentDashboard = () => {
       color: 'orange'
     }
   ];
+
+  const displayAchievements = recentAchievements.length > 0 ? recentAchievements : fallbackAchievements;
 
   const enrolledCourses = [
     {
@@ -94,6 +165,38 @@ const StudentDashboard = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="student-dashboard">
+        <Navbar />
+        <div className="dashboard-container">
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading your dashboard...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="student-dashboard">
+        <Navbar />
+        <div className="dashboard-container">
+          <div className="error-state">
+            <p>Error: {error}</p>
+            <button onClick={() => window.location.reload()} className="retry-button">
+              Retry
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="student-dashboard">
       <Navbar />
@@ -102,14 +205,14 @@ const StudentDashboard = () => {
         {/* Welcome Header */}
         <div className="welcome-header">
           <div className="welcome-content">
-            <h1 className="welcome-title">Welcome back, Priya!</h1>
+            <h1 className="welcome-title">Welcome back, {user?.name || 'Student'}!</h1>
             <p className="welcome-subtitle">Ready to continue your language learning journey today?</p>
           </div>
           <div className="current-streak">
             <div className="streak-badge">
               <FaFire className="streak-icon" />
               <div className="streak-content">
-                <div className="streak-number">5 days</div>
+                <div className="streak-number">{currentStreak} days</div>
                 <div className="streak-label">Current Streak</div>
               </div>
             </div>
@@ -170,7 +273,7 @@ const StudentDashboard = () => {
               <FaTrophy className="card-icon" />
             </div>
             <div className="achievements-list">
-              {recentAchievements.map((achievement) => (
+              {displayAchievements.map((achievement) => (
                 <div key={achievement.id} className="achievement-card">
                   <div className={`achievement-icon ${achievement.color}`}>
                     {achievement.icon}

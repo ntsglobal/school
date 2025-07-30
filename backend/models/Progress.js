@@ -307,7 +307,7 @@ progressSchema.statics.getUserCourseProgress = function(userId, courseId) {
 
 progressSchema.statics.getOverallProgress = function(userId) {
   return this.aggregate([
-    { $match: { userId: mongoose.Types.ObjectId(userId) } },
+    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: '$courseId',

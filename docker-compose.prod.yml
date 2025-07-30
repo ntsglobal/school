@@ -4,12 +4,12 @@ services:
   # MongoDB Database
   mongodb:
     image: mongo:7.0
-    container_name: nts-mongodb
+    container_name: nts-mongodb-prod
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: nts-language-learning
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
     ports:
       - "27017:27017"
     volumes:
@@ -17,11 +17,12 @@ services:
       - ./backend/scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - nts-network
+    command: mongod --auth
 
-  # Redis Cache (Optional)
+  # Redis Cache
   redis:
     image: redis:7.2-alpine
-    container_name: nts-redis
+    container_name: nts-redis-prod
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -29,55 +30,57 @@ services:
       - redis_data:/data
     networks:
       - nts-network
+    command: redis-server --requirepass ${REDIS_PASSWORD}
 
-  # Backend API (Development)
+  # Backend API
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
       args:
-        NODE_ENV: development
-    container_name: nts-backend-dev
+        NODE_ENV: production
+    container_name: nts-backend-prod
     restart: unless-stopped
+    env_file:
+      - ./backend/.env
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 5000
-      MONGODB_URI: mongodb://admin:password123@mongodb:27017/nts-language-learning?authSource=admin
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: nts-super-secret-jwt-key-for-development-only
-      FRONTEND_URL: http://localhost:5173
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DATABASE}?authSource=admin
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
     ports:
       - "5000:5000"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
     depends_on:
       - mongodb
       - redis
     networks:
       - nts-network
-    command: npm run dev
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  # Frontend Application (Development)
+  # Frontend Application
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: development
-    container_name: nts-frontend-dev
+      target: production
+    container_name: nts-frontend-prod
     restart: unless-stopped
-    environment:
-      VITE_API_BASE_URL: http://localhost:5000/api
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "80:80"
     depends_on:
       - backend
     networks:
       - nts-network
-    command: npm run dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   mongodb_data:

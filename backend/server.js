@@ -93,7 +93,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/gamification', gamificationRoutes);
-app.use('/api/live-classes', liveClassRoutes);
+app.use('/api/liveClasses', liveClassRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/badges', badgeRoutes);
