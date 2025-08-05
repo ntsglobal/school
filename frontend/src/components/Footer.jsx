@@ -24,9 +24,9 @@ function Footer() {
             <div>
               <h4 className="font-semibold mb-2">Product</h4>
               <ul className="space-y-1 text-gray-300">
-                <li><a href="#">Features</a></li>
+                <li><a href="/">Features</a></li>
                 <li><a href="#">Languages</a></li>
-                <li><a href="#">Pricing</a></li>
+                <li><a href="/pricing">Pricing</a></li>
                 <li><a href="#">Updates</a></li>
               </ul>
             </div>
@@ -35,7 +35,7 @@ function Footer() {
             <div>
               <h4 className="font-semibold mb-2">Company</h4>
               <ul className="space-y-1 text-gray-300">
-                <li><a href="#">About</a></li>
+                <li><a href="/about">About</a></li>
                 <li><a href="#">Careers</a></li>
                 <li><a href="#">Blog</a></li>
                 <li><a href="#">Press</a></li>
@@ -49,7 +49,7 @@ function Footer() {
                 <li><a href="#">Help Center</a></li>
                 <li><a href="#">Terms</a></li>
                 <li><a href="/privacy-policy">Privacy</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="/contact">Contact</a></li>
               </ul>
             </div>
           </div>
