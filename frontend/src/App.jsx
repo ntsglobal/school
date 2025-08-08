@@ -269,7 +269,7 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* AI Language Lab Page */}
+        {/* AI Language Lab Pages */}
         <Route path="/language-lab" element={
           <ProtectedRoute>
             <div>
