@@ -47,7 +47,7 @@ function Footer() {
               <h4 className="font-semibold mb-2">Resources</h4>
               <ul className="space-y-1 text-gray-300">
                 <li><a href="#">Help Center</a></li>
-                <li><a href="#">Terms</a></li>
+                <li><a href="/terms-of-service">Terms</a></li>
                 <li><a href="/privacy-policy">Privacy</a></li>
                 <li><a href="/contact">Contact</a></li>
               </ul>

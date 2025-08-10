@@ -42,6 +42,7 @@ import PremiumPage from './pages/PremiumPage/PremiumPage.jsx';
 import LiveClassVideoRoom from './components/LiveClassVideoRoom.jsx';
 import LiveClassesPage from './pages/LiveClassesPage/LiveClassesPage.jsx';
 import LiveClassDetailPage from './pages/LiveClassDetailPage/LiveClassDetailPage.jsx';
+import Terms from "./pages/TermsPage/Terms";
 
 
 function App() {
@@ -59,7 +60,7 @@ function App() {
             </div>
           }
         />
-        
+
         {/* Role Selection Page shown first */}
         <Route path="/role-selection" element={
           <div>
@@ -78,7 +79,7 @@ function App() {
         } />
 
         {/* Sign Up Page Route */}
-        <Route path="/signup" element={ 
+        <Route path="/signup" element={
           <div>
             <Navbar />
             <SignUp />
@@ -86,7 +87,7 @@ function App() {
           </div>
         } />
 
-        {/* Forgot Password Page Route */} 
+        {/* Forgot Password Page Route */}
         <Route path="/forgot-password" element={
           <div>
             <Navbar />
@@ -269,7 +270,7 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* AI Language Lab Pages */}
+        {/* AI Language Lab Page */}
         <Route path="/language-lab" element={
           <ProtectedRoute>
             <div>
@@ -333,6 +334,18 @@ function App() {
             </div>
           </ProtectedRoute>
         } />
+        {/* Terms of Service Page */}
+        <Route
+          path="/terms-of-service"
+          element={
+            <div>
+              <Navbar />
+              <Terms />
+              <Footer />
+            </div>
+          }
+        />
+
       </Routes>
     </AuthProvider>
   );
