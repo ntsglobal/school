@@ -43,8 +43,6 @@ import LiveClassVideoRoom from './components/LiveClassVideoRoom.jsx';
 import LiveClassesPage from './pages/LiveClassesPage/LiveClassesPage.jsx';
 import LiveClassDetailPage from './pages/LiveClassDetailPage/LiveClassDetailPage.jsx';
 import Terms from "./pages/TermsPage/Terms";
-
-
 function App() {
   return (
     <AuthProvider>
@@ -227,14 +225,16 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* Help Center Page */}
-        <Route path="/help-center" element={
-          <div>
-            <Navbar />
-            <HelpCenter />
-            <Footer />
-          </div>
-        } />
+        <Route
+          path="/help-center"
+          element={
+            <>
+              <Navbar />
+              <HelpCenter /> {/* Make sure HelpCenter.jsx does NOT have Navbar/Footer inside */}
+              <Footer />
+            </>
+          }
+        />
 
         {/* Courses Page */}
         <Route path="/courses" element={
