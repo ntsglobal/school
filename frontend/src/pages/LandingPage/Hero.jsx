@@ -1,9 +1,57 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import bgImage from "/images/bgImage.png";
 
 function Hero() {
   const navigate = useNavigate();
+  const { isAuthenticated, user, hasRole } = useAuth();
+
+  // Handle language selection based on authentication status
+  const handleLanguageSelect = (languageName) => {
+    if (isAuthenticated) {
+      // For authenticated users, navigate to appropriate dashboard or language selection
+      if (user?.role === 'user') {
+        // User needs to complete onboarding
+        navigate('/role-selection');
+      } else {
+        // Navigate to language selection or courses
+        navigate('/language-selection');
+      }
+    } else {
+      // For guests, navigate to signup
+      if (languageName === "Explore Others") {
+        navigate("/signup");
+      } else {
+        navigate(`/signup/${languageName.toLowerCase()}`);
+      }
+    }
+  };
+
+  // Handle start journey button based on authentication status
+  const handleStartJourney = () => {
+    if (isAuthenticated) {
+      // User is logged in, redirect to appropriate dashboard
+      if (user?.role === 'user') {
+        // User needs to complete onboarding
+        navigate('/role-selection');
+      } else if (hasRole('student')) {
+        navigate('/student-dashboard');
+      } else if (hasRole('teacher')) {
+        navigate('/teacher-dashboard');
+      } else if (hasRole('admin')) {
+        navigate('/admin-dashboard');
+      } else if (hasRole('parent')) {
+        navigate('/parent-portal');
+      } else {
+        // Fallback to dashboard redirect
+        navigate('/dashboard');
+      }
+    } else {
+      // User is not logged in, go to signup
+      navigate('/signup');
+    }
+  };
 
   const languages = [
     { name: "French", icon: "/images/icons/french.png" },
@@ -54,41 +102,40 @@ function Hero() {
         </p>
 
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-  {languages.map((lang) => (
-    <div
-      key={lang.name}
-      className="flex flex-col items-center gap-1 w-[70px] cursor-pointer"
-      onClick={() =>
-        lang.name === "Explore Others"
-          ? navigate("/signup")
-          : navigate(`/signup/${lang.name.toLowerCase()}`)
-      }
-    >
-      <div className="w-14 h-14 rounded-full bg-white shadow flex items-center justify-center overflow-hidden">
-        <img
-          src={lang.icon}
-          alt={`${lang.name} icon`}
-          className="w-8 h-8 object-contain"
-        />
-      </div>
-      <span className="text-xs font-medium text-gray-800">
-        {lang.name}
-      </span>
-    </div>
-  ))}
-</div>
+          {languages.map((lang) => (
+            <div
+              key={lang.name}
+              className="flex flex-col items-center gap-1 w-[70px] cursor-pointer"
+              onClick={() => handleLanguageSelect(lang.name)}
+            >
+              <div className="w-14 h-14 rounded-full bg-white shadow flex items-center justify-center overflow-hidden">
+                <img
+                  src={lang.icon}
+                  alt={`${lang.name} icon`}
+                  className="w-8 h-8 object-contain"
+                />
+              </div>
+              <span className="text-xs font-medium text-gray-800">
+                {lang.name}
+              </span>
+            </div>
+          ))}
+        </div>
 
 
 
-        {/* Now navigates to /signup */}
+        {/* Smart navigation button based on authentication status */}
         <button
-          onClick={() => navigate("/signup")}
+          onClick={handleStartJourney}
           className="px-6 py-3 bg-green-700 text-white rounded-full font-bold shadow-md hover:brightness-110 transition"
         >
-          Start Your Journey
+          {isAuthenticated ? "Continue Learning" : "Start Your Journey"}
         </button>
         <p className="text-xs text-gray-700 mt-2">
-          Tap to begin your multilingual mastery
+          {isAuthenticated 
+            ? "Access your personalized dashboard" 
+            : "Tap to begin your multilingual mastery"
+          }
         </p>
       </div>
     </div>

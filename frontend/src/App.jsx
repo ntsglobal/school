@@ -4,7 +4,15 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import './i18n'; // Initialize i18n
 
 import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute, {
+  StudentRoute,
+  TeacherRoute,
+  ParentRoute,
+  AdminRoute,
+  TeacherOrAdminRoute,
+  ParentOrAdminRoute
+} from './components/ProtectedRoute';
+import DashboardRedirect from './components/DashboardRedirect';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Hero from './pages/LandingPage/Hero';
@@ -42,12 +50,13 @@ import PremiumPage from './pages/PremiumPage/PremiumPage.jsx';
 import LiveClassVideoRoom from './components/LiveClassVideoRoom.jsx';
 import LiveClassesPage from './pages/LiveClassesPage/LiveClassesPage.jsx';
 import LiveClassDetailPage from './pages/LiveClassDetailPage/LiveClassDetailPage.jsx';
+import UnauthorizedPage from './pages/UnauthorizedPage/UnauthorizedPage.jsx';
 import Terms from "./pages/TermsPage/Terms";
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Landing Page Route */}
+        {/* Public Routes */}
         <Route
           path="/"
           element={
@@ -59,7 +68,55 @@ function App() {
           }
         />
 
-        {/* Role Selection Page shown first */}
+        <Route path="/about" element={
+          <div>
+            <Navbar />
+            <About />
+            <Footer />
+          </div>
+        } />
+
+        <Route path="/contact" element={
+          <div>
+            <Navbar />
+            <Contact />
+            <Footer />
+          </div>
+        } />
+
+        <Route path="/courses" element={
+          <div>
+            <Navbar />
+            <CoursesPage />
+            <Footer />
+          </div>
+        } />
+
+        <Route path="/help-center" element={
+          <>
+            <Navbar />
+            <HelpCenter />
+            <Footer />
+          </>
+        } />
+
+        <Route path="/privacy-policy" element={
+          <div>
+            <Navbar />
+            <PrivacyPolicy />
+            <Footer />
+          </div>
+        } />
+
+        <Route path="/terms-of-service" element={
+          <div>
+            <Navbar />
+            <Terms />
+            <Footer />
+          </div>
+        } />
+
+        {/* Authentication Routes */}
         <Route path="/role-selection" element={
           <div>
             <RoleSelectionPage />
@@ -67,7 +124,6 @@ function App() {
           </div>
         } />
 
-        {/* Login/Register Page Route */}
         <Route path="/login" element={
           <div>
             <Navbar />
@@ -76,7 +132,6 @@ function App() {
           </div>
         } />
 
-        {/* Sign Up Page Route */}
         <Route path="/signup" element={
           <div>
             <Navbar />
@@ -85,7 +140,6 @@ function App() {
           </div>
         } />
 
-        {/* Forgot Password Page Route */}
         <Route path="/forgot-password" element={
           <div>
             <Navbar />
@@ -94,7 +148,6 @@ function App() {
           </div>
         } />
 
-        {/* Reset Password Page Route */}
         <Route path="/reset-password" element={
           <div>
             <ResetPassword />
@@ -102,7 +155,10 @@ function App() {
           </div>
         } />
 
-        {/* Onboarding Page */}
+        {/* Dashboard Redirect Route */}
+        <Route path="/dashboard" element={<DashboardRedirect />} />
+
+        {/* Protected Onboarding Routes */}
         <Route path="/onboarding/step1" element={
           <ProtectedRoute>
             <div>
@@ -112,6 +168,7 @@ function App() {
             </div>
           </ProtectedRoute>
         } />
+        
         <Route path="/onboarding/step2" element={
           <ProtectedRoute>
             <div>
@@ -121,6 +178,7 @@ function App() {
             </div>
           </ProtectedRoute>
         } />
+        
         <Route path="/onboarding/step3" element={
           <ProtectedRoute>
             <div>
@@ -131,90 +189,119 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* Language Selection Page */}
         <Route path="/language-selection" element={
           <ProtectedRoute>
             <LanguageSelectionPage />
           </ProtectedRoute>
         } />
 
-        {/* Privacy Policy Page */}
-        <Route path="/privacy-policy" element={
-          <div>
-            <Navbar />
-            <PrivacyPolicy />
-            <Footer />
-          </div>
-        } />
-
-        {/* About Page */}
-        <Route path="/about" element={
-          <div>
-            <Navbar />
-            <About />
-            <Footer />
-          </div>
-        } />
-
-        {/* Contact Page */}
-        <Route path="/contact" element={
-          <div>
-            <Navbar />
-            <Contact />
-            <Footer />
-          </div>
-        } />
-
-        {/* Assessment Page */}
-        <Route path="/assessment" element={
-          <ProtectedRoute>
-            <AssessmentPage />
-          </ProtectedRoute>
-        } />
-
-        {/* Assessment Dashboard */}
-        <Route path="/assessment-dashboard" element={
-          <ProtectedRoute>
-            <AssessmentDashboard />
-          </ProtectedRoute>
-        } />
-
-        {/* Parent Portal */}
-        <Route path="/parent-portal" element={
-          <ProtectedRoute>
-            <ParentPortal />
-          </ProtectedRoute>
-        } />
-
-        {/* Student Dashboard */}
+        {/* Student-Only Routes */}
         <Route path="/student-dashboard" element={
-          <ProtectedRoute>
+          <StudentRoute>
             <StudentDashboard />
-          </ProtectedRoute>
+          </StudentRoute>
         } />
 
-        {/* Teacher Dashboard */}
-        <Route path="/teacher-dashboard" element={
-          <ProtectedRoute>
-            <TeacherDashboard />
-          </ProtectedRoute>
+        <Route path="/assessment" element={
+          <StudentRoute>
+            <AssessmentPage />
+          </StudentRoute>
         } />
 
-        {/* Admin Dashboard */}
-        <Route path="/admin-dashboard" element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
+        <Route path="/language-lab" element={
+          <StudentRoute>
+            <div>
+              <Navbar />
+              <AILanguageLab />
+              <Footer />
+            </div>
+          </StudentRoute>
         } />
 
-        {/* Gamification Dashboard */}
+        <Route path="/culture-exploration" element={
+          <StudentRoute>
+            <div>
+              <Navbar />
+              <CultureExploration />
+              <Footer />
+            </div>
+          </StudentRoute>
+        } />
+
+        <Route path="/buddy-finder" element={
+          <StudentRoute>
+            <div>
+              <Navbar />
+              <LanguageBuddyPage />
+              <Footer />
+            </div>
+          </StudentRoute>
+        } />
+
         <Route path="/gamification" element={
-          <ProtectedRoute>
+          <StudentRoute>
             <GamificationDashboard />
+          </StudentRoute>
+        } />
+
+        {/* Teacher-Only Routes */}
+        <Route path="/teacher-dashboard" element={
+          <TeacherRoute>
+            <TeacherDashboard />
+          </TeacherRoute>
+        } />
+
+        <Route path="/assessment-dashboard" element={
+          <TeacherOrAdminRoute>
+            <AssessmentDashboard />
+          </TeacherOrAdminRoute>
+        } />
+
+        {/* Admin-Only Routes */}
+        <Route path="/admin-dashboard" element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        } />
+
+        {/* Parent-Only Routes */}
+        <Route path="/parent-portal" element={
+          <ParentRoute>
+            <ParentPortal />
+          </ParentRoute>
+        } />
+
+        {/* Multi-Role Routes */}
+        <Route path="/community" element={
+          <ProtectedRoute>
+            <Community />
           </ProtectedRoute>
         } />
 
-        {/* Recorded Classes Page */}
+        <Route path="/community/new-discussion" element={
+          <ProtectedRoute>
+            <NewDiscussion />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/live-classes" element={
+          <ProtectedRoute>
+            <LiveClassesPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/live-classes/:id" element={
+          <ProtectedRoute>
+            <LiveClassDetailPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/live-classes/:id/video" element={
+          <ProtectedRoute>
+            <LiveClassVideoRoom />
+          </ProtectedRoute>
+        } />
+
         <Route path="/recorded-classes" element={
           <ProtectedRoute>
             <div>
@@ -225,95 +312,6 @@ function App() {
           </ProtectedRoute>
         } />
 
-        <Route
-          path="/help-center"
-          element={
-            <>
-              <Navbar />
-              <HelpCenter /> {/* Make sure HelpCenter.jsx does NOT have Navbar/Footer inside */}
-              <Footer />
-            </>
-          }
-        />
-
-        {/* Courses Page */}
-        <Route path="/courses" element={
-          <div>
-            <Navbar />
-            <CoursesPage />
-            <Footer />
-          </div>
-        } />
-
-        {/* Community Page */}
-        <Route path="/community" element={
-          <ProtectedRoute>
-            <Community />
-          </ProtectedRoute>
-        } />
-
-        {/* New Discussion Page */}
-        <Route path="/community/new-discussion" element={
-          <ProtectedRoute>
-            <NewDiscussion />
-          </ProtectedRoute>
-        } />
-
-        {/* Language Buddy Finder Page */}
-        <Route path="/buddy-finder" element={
-          <ProtectedRoute>
-            <div>
-              <Navbar />
-              <LanguageBuddyPage />
-              <Footer />
-            </div>
-          </ProtectedRoute>
-        } />
-
-        {/* AI Language Lab Page */}
-        <Route path="/language-lab" element={
-          <ProtectedRoute>
-            <div>
-              <Navbar />
-              <AILanguageLab />
-              <Footer />
-            </div>
-          </ProtectedRoute>
-        } />
-
-        {/* Culture Exploration Page */}
-        <Route path="/culture-exploration" element={
-          <ProtectedRoute>
-            <div>
-              <Navbar />
-              <CultureExploration />
-              <Footer />
-            </div>
-          </ProtectedRoute>
-        } />
-
-        {/* Live Classes Page */}
-        <Route path="/live-classes" element={
-          <ProtectedRoute>
-            <LiveClassesPage />
-          </ProtectedRoute>
-        } />
-
-        {/* Live Class Detail Page */}
-        <Route path="/live-classes/:id" element={
-          <ProtectedRoute>
-            <LiveClassDetailPage />
-          </ProtectedRoute>
-        } />
-
-        {/* Live Class Video Room */}
-        <Route path="/live-classes/:id/video" element={
-          <ProtectedRoute>
-            <LiveClassVideoRoom />
-          </ProtectedRoute>
-        } />
-
-        {/* Premium Page */}
         <Route path="/premium" element={
           <ProtectedRoute>
             <div>
@@ -324,7 +322,6 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* Pricing Page (alias for Premium) */}
         <Route path="/pricing" element={
           <ProtectedRoute>
             <div>
@@ -334,17 +331,9 @@ function App() {
             </div>
           </ProtectedRoute>
         } />
-        {/* Terms of Service Page */}
-        <Route
-          path="/terms-of-service"
-          element={
-            <div>
-              <Navbar />
-              <Terms />
-              <Footer />
-            </div>
-          }
-        />
+
+        {/* Access Denied Route */}
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       </Routes>
     </AuthProvider>

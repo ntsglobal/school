@@ -296,6 +296,21 @@ class CourseService {
     };
     return flags[language] || '🌍';
   }
+
+  // Get courses taught by a teacher
+  async getTeacherCourses(teacherId = null, params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const endpoint = teacherId 
+        ? `/courses/teacher/${teacherId}${queryString ? `?${queryString}` : ''}`
+        : `/courses/teacher/me${queryString ? `?${queryString}` : ''}`;
+      const response = await apiService.get(endpoint);
+      return response;
+    } catch (error) {
+      console.error('Get teacher courses error:', error);
+      throw error;
+    }
+  }
 }
 
 // Create and export a singleton instance

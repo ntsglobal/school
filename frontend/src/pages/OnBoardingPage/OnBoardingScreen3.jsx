@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import authService from "../../services/authService";
 import { FaClock } from "react-icons/fa";
 
 const learningGoals = [
@@ -28,17 +30,84 @@ const learningGoals = [
 
 const OnBoardingScreen3 = () => {
   const navigate = useNavigate();
+  const { user, hasRole, updateUser } = useAuth();
   const [selectedGoal, setSelectedGoal] = useState(null);
+  const [isCompleting, setIsCompleting] = useState(false);
 
-  const handleConfirm = () => {
-    if (!selectedGoal) return;
-    // Save to localStorage
-    const data = JSON.parse(localStorage.getItem("onboardingData")) || {};
-    data.learningGoal = selectedGoal;
-    localStorage.setItem("onboardingData", JSON.stringify(data));
+  const handleConfirm = async () => {
+    if (!selectedGoal || isCompleting) return;
+    
+    setIsCompleting(true);
+    
+    try {
+      // Save to localStorage
+      const data = JSON.parse(localStorage.getItem("onboardingData")) || {};
+      data.learningGoal = selectedGoal;
+      localStorage.setItem("onboardingData", JSON.stringify(data));
 
-    // Go to home or dashboard or success page
-    navigate("/home");
+      // Get selected role from localStorage
+      const selectedRole = localStorage.getItem('selectedRole');
+      
+      if (selectedRole && user?.role === 'user') {
+        // Complete onboarding with backend
+        const onboardingData = {
+          role: selectedRole,
+          learningGoal: selectedGoal,
+          ...data // Include any other onboarding data
+        };
+
+        // Add role-specific data if student
+        if (selectedRole === 'student') {
+          onboardingData.grade = data.grade || 9; // Default grade
+          onboardingData.board = data.board || 'CBSE'; // Default board
+        }
+
+        const response = await authService.completeOnboarding(onboardingData);
+        
+        if (response.success) {
+          // Update user context
+          updateUser(response.data.user);
+          
+          // Clear temporary data
+          localStorage.removeItem('selectedRole');
+          localStorage.removeItem('onboardingData');
+        }
+      }
+
+      // Redirect to appropriate dashboard based on user role or selected role
+      const finalRole = selectedRole || user?.role;
+      if (finalRole === 'student') {
+        navigate("/student-dashboard");
+      } else if (finalRole === 'teacher') {
+        navigate("/teacher-dashboard");
+      } else if (finalRole === 'admin') {
+        navigate("/admin-dashboard");
+      } else if (finalRole === 'parent') {
+        navigate("/parent-portal");
+      } else {
+        // Fallback to home if role is not recognized
+        navigate("/");
+      }
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      // Still navigate even if API call fails, user can complete profile later
+      const selectedRole = localStorage.getItem('selectedRole');
+      const finalRole = selectedRole || user?.role;
+      
+      if (finalRole === 'student') {
+        navigate("/student-dashboard");
+      } else if (finalRole === 'teacher') {
+        navigate("/teacher-dashboard");
+      } else if (finalRole === 'admin') {
+        navigate("/admin-dashboard");
+      } else if (finalRole === 'parent') {
+        navigate("/parent-portal");
+      } else {
+        navigate("/");
+      }
+    } finally {
+      setIsCompleting(false);
+    }
   };
 
   return (
@@ -96,12 +165,14 @@ const OnBoardingScreen3 = () => {
       <div className="text-center">
         <button
           onClick={handleConfirm}
-          disabled={!selectedGoal}
+          disabled={!selectedGoal || isCompleting}
           className={`px-6 py-2 rounded text-white font-medium transition duration-200 ${
-            selectedGoal ? "bg-green-600 hover:bg-green-700" : "bg-gray-300 cursor-not-allowed"
+            selectedGoal && !isCompleting 
+              ? "bg-green-600 hover:bg-green-700" 
+              : "bg-gray-300 cursor-not-allowed"
           }`}
         >
-          Confirm Your Daily Goal
+          {isCompleting ? "Completing Setup..." : "Confirm Your Daily Goal"}
         </button>
         <p className="text-xs text-gray-500 mt-2">
           You can always adjust your goal later

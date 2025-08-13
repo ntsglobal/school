@@ -7,11 +7,13 @@ import {
   updateProgress,
   getProgressAnalytics,
   getWeeklyReport,
-  getMonthlyReport
+  getMonthlyReport,
+  getTeacherProgress
 } from '../controllers/progressController.js';
 import { 
   verifyFirebaseAuth, 
-  canAccessStudentData 
+  canAccessStudentData,
+  isTeacherOrAdmin
 } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -27,5 +29,8 @@ router.put('/user/:userId/lesson/:lessonId', verifyFirebaseAuth, updateProgress)
 router.get('/user/:userId/analytics', verifyFirebaseAuth, canAccessStudentData, getProgressAnalytics);
 router.get('/user/:userId/report/weekly', verifyFirebaseAuth, canAccessStudentData, getWeeklyReport);
 router.get('/user/:userId/report/monthly', verifyFirebaseAuth, canAccessStudentData, getMonthlyReport);
+
+// Teacher routes
+router.get('/teacher/me', verifyFirebaseAuth, isTeacherOrAdmin, getTeacherProgress);
 
 export default router;

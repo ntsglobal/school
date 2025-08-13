@@ -483,6 +483,25 @@ class AuthService {
       return [];
     }
   }
+
+  // Complete user onboarding
+  async completeOnboarding(onboardingData) {
+    try {
+      const response = await apiService.post('/auth/complete-onboarding', onboardingData);
+      
+      if (response.success) {
+        // Update current user data
+        this.currentUser = { ...this.currentUser, ...response.data.user };
+        this.saveUserData(this.currentUser, localStorage.getItem('authToken'), localStorage.getItem('firebaseToken'));
+        return response;
+      }
+      
+      throw new Error(response.message || 'Failed to complete onboarding');
+    } catch (error) {
+      console.error('Complete onboarding error:', error);
+      throw error;
+    }
+  }
 }
 
 export default new AuthService();

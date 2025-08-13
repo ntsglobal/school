@@ -360,7 +360,7 @@ export const getStudentsByTeacher = async (req, res) => {
     const teacherId = req.params.teacherId;
 
     // Check if requesting user is the teacher or admin
-    if (req.user.role !== 'admin' && req.user.id !== teacherId) {
+    if (req.user.role !== 'admin' && req.user.id.toString() !== teacherId) {
       return res.status(403).json({
         success: false,
         message: 'Access denied'

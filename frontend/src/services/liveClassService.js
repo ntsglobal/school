@@ -47,7 +47,7 @@ export const getLiveClassById = async (id) => {
 export const createLiveClass = async (liveClassData) => {
   try {
     const response = await apiService.post('/liveClasses', liveClassData);
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error creating live class:', error);
     throw error;

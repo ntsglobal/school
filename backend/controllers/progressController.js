@@ -680,3 +680,122 @@ const generateRecommendations = (progressData) => {
   // Implementation for generating recommendations
   return [];
 };
+
+// Get teacher progress overview
+export const getTeacherProgress = async (req, res) => {
+  try {
+    const teacherId = req.user.id; // Use MongoDB ObjectId, not Firebase UID
+
+    // Get courses taught by this teacher
+    const teacherCourses = await Course.find({
+      $or: [
+        { instructor: teacherId },
+        { coInstructors: { $in: [teacherId] } }
+      ],
+      isActive: true
+    }).select('_id title');
+
+    const courseIds = teacherCourses.map(course => course._id);
+
+    // Get progress data for all students in teacher's courses
+    const progressData = await Progress.aggregate([
+      { $match: { courseId: { $in: courseIds } } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'student'
+        }
+      },
+      {
+        $lookup: {
+          from: 'courses',
+          localField: 'courseId',
+          foreignField: '_id',
+          as: 'course'
+        }
+      },
+      {
+        $lookup: {
+          from: 'lessons',
+          localField: 'lessonId',
+          foreignField: '_id',
+          as: 'lesson'
+        }
+      },
+      {
+        $unwind: '$student'
+      },
+      {
+        $unwind: '$course'
+      },
+      {
+        $unwind: '$lesson'
+      }
+    ]);
+
+    // Calculate overview statistics
+    const totalStudents = await User.countDocuments({
+      enrolledCourses: { $in: courseIds }
+    });
+
+    const recentActivities = progressData
+      .filter(p => p.updatedAt >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+      .map(p => ({
+        studentName: `${p.student.firstName} ${p.student.lastName}`,
+        courseName: p.course.title,
+        lessonName: p.lesson.title,
+        action: p.status === 'completed' ? 'completed' : 'in_progress',
+        score: p.bestScore,
+        timestamp: p.updatedAt
+      }))
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 10);
+
+    // Course performance summary
+    const coursePerformance = courseIds.map(courseId => {
+      const courseProgress = progressData.filter(p => p.courseId.toString() === courseId.toString());
+      const course = teacherCourses.find(c => c._id.toString() === courseId.toString());
+      
+      const totalLessons = courseProgress.length;
+      const completedLessons = courseProgress.filter(p => p.status === 'completed').length;
+      const avgScore = totalLessons > 0 
+        ? courseProgress.reduce((sum, p) => sum + p.bestScore, 0) / totalLessons 
+        : 0;
+
+      return {
+        courseId,
+        courseName: course.title,
+        totalStudents: new Set(courseProgress.map(p => p.userId.toString())).size,
+        totalLessons,
+        completedLessons,
+        avgScore: Math.round(avgScore),
+        completionRate: totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
+      };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        overview: {
+          totalStudents,
+          totalCourses: courseIds.length,
+          totalActivities: progressData.length,
+          avgScore: progressData.length > 0 
+            ? Math.round(progressData.reduce((sum, p) => sum + p.bestScore, 0) / progressData.length)
+            : 0
+        },
+        recentActivities,
+        coursePerformance
+      }
+    });
+
+  } catch (error) {
+    console.error('Get teacher progress error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};

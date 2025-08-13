@@ -34,6 +34,11 @@ const ProtectedRoute = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Check if user has generic 'user' role (needs onboarding)
+  if (user?.role === 'user' && location.pathname !== '/role-selection' && !location.pathname.startsWith('/onboarding')) {
+    return <Navigate to="/role-selection" replace />;
+  }
+
   // Check for specific role requirement
   if (requiredRole && !hasRole(requiredRole)) {
     return <Navigate to="/unauthorized" replace />;

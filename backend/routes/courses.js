@@ -11,7 +11,8 @@ import {
   getCoursesByGrade,
   enrollInCourse,
   unenrollFromCourse,
-  getUserCourses
+  getUserCourses,
+  getTeacherCourses
 } from '../controllers/courseController.js';
 import { 
   verifyFirebaseAuth, 
@@ -30,6 +31,7 @@ router.get('/grade/:grade', getCoursesByGrade);
 
 // User-specific routes
 router.get('/user/enrolled', verifyFirebaseAuth, getUserCourses);
+router.get('/teacher/me', verifyFirebaseAuth, isTeacherOrAdmin, getTeacherCourses);
 router.post('/:id/enroll', verifyFirebaseAuth, enrollInCourse);
 router.delete('/:id/unenroll', verifyFirebaseAuth, unenrollFromCourse);
 

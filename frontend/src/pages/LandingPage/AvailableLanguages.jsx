@@ -1,8 +1,27 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 function AvailableLanguages() {
   const navigate = useNavigate();
+  const { isAuthenticated, user, hasRole } = useAuth();
+
+  // Handle language learning action based on authentication
+  const handleStartLearning = (languageName) => {
+    if (isAuthenticated) {
+      // User is logged in
+      if (user?.role === 'user') {
+        // User needs to complete onboarding
+        navigate('/role-selection');
+      } else {
+        // Navigate to language-specific courses or language selection
+        navigate(`/courses?language=${languageName.toLowerCase()}`);
+      }
+    } else {
+      // User not logged in, go to signup
+      navigate("/signup");
+    }
+  };
 
   const languages = [
     { name: "French", level: "Beginner Friendly", icon: "/images/icons/french.png" },
@@ -30,10 +49,10 @@ function AvailableLanguages() {
             </div>
             <p className="text-sm text-gray-600">{lang.level}</p>
             <button
-              onClick={() => navigate("/signup")}
+              onClick={() => handleStartLearning(lang.name)}
               className="mt-3 bg-green-700 text-white text-sm px-3 py-1 rounded-full hover:bg-green-800"
             >
-              Start Learning
+              {isAuthenticated ? "Explore Courses" : "Start Learning"}
             </button>
           </div>
         ))}

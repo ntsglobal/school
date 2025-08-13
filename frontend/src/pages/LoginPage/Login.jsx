@@ -64,10 +64,14 @@ const Login = () => {
       const result = await login(loginData);
       
       // Get user role from the login result or from context
-      const userRole = result?.role || role || formData.role;
+      const userRole = result?.data?.user?.role || result?.role || role || formData.role;
       const redirectUrl = getRedirectUrl(userRole);
       
-      navigate(redirectUrl);
+      // Force navigation to the correct dashboard, ignore any previous intended route
+      // Add a small delay to ensure authentication context is updated
+      setTimeout(() => {
+        navigate(redirectUrl, { replace: true });
+      }, 200);
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
     } finally {
@@ -109,7 +113,14 @@ const Login = () => {
         const userRole = data.data.user?.role;
         const redirectUrl = getRedirectUrl(userRole);
         
-        navigate(redirectUrl);
+        console.log('Google login successful - User role:', userRole, 'Redirect URL:', redirectUrl);
+        
+        // Force navigation to the correct dashboard, ignore any previous intended route
+        // Add a small delay to ensure authentication context is updated
+        setTimeout(() => {
+          console.log('Navigating to:', redirectUrl);
+          navigate(redirectUrl, { replace: true });
+        }, 100);
       } else {
         throw new Error(data.message || 'Login failed');
       }
@@ -159,7 +170,11 @@ const Login = () => {
         const userRole = data.data.user?.role;
         const redirectUrl = getRedirectUrl(userRole);
         
-        navigate(redirectUrl);
+        // Force navigation to the correct dashboard, ignore any previous intended route
+        // Add a small delay to ensure authentication context is updated
+        setTimeout(() => {
+          navigate(redirectUrl, { replace: true });
+        }, 100);
       } else {
         throw new Error(data.message || 'Login failed');
       }

@@ -71,10 +71,9 @@ export const createLiveClass = async (req, res) => {
     const {
       title,
       description,
-      course,
       language,
       level,
-      scheduledDate,
+      scheduledAt,
       duration,
       maxParticipants,
       meetingUrl,
@@ -84,11 +83,10 @@ export const createLiveClass = async (req, res) => {
     const liveClass = new LiveClass({
       title,
       description,
-      course,
       language,
       level,
-      instructor: req.user._id,
-      scheduledDate,
+      instructor: req.user.id, // Use req.user.id instead of req.user._id
+      scheduledAt,
       duration,
       maxParticipants,
       meetingUrl,
@@ -131,7 +129,7 @@ export const updateLiveClass = async (req, res) => {
     }
 
     // Check if user is instructor or admin
-    if (liveClass.instructor.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    if (liveClass.instructor.toString() !== req.user.id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to update this live class'
@@ -192,7 +190,7 @@ export const deleteLiveClass = async (req, res) => {
 export const joinLiveClass = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const liveClass = await LiveClass.findById(id);
     
@@ -251,7 +249,7 @@ export const joinLiveClass = async (req, res) => {
 export const leaveLiveClass = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const liveClass = await LiveClass.findById(id);
     
@@ -298,15 +296,25 @@ export const startLiveClass = async (req, res) => {
     }
 
     // Check if user is instructor
-    if (liveClass.instructor.toString() !== req.user._id.toString()) {
+    if (liveClass.instructor.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Only instructor can start the class'
       });
     }
 
-    liveClass.status = 'ongoing';
+    liveClass.status = 'live';
     liveClass.actualStartTime = new Date();
+    
+    // Generate video call URL if not already set
+    if (!liveClass.meetingUrl) {
+      // For now, we'll use a placeholder video service URL
+      // In production, you would integrate with services like:
+      // - Zoom API, Jitsi Meet, WebRTC, Agora, etc.
+      const roomId = `room_${liveClass._id}_${Date.now()}`;
+      liveClass.meetingUrl = `https://meet.jit.si/${roomId}`;
+    }
+    
     await liveClass.save();
 
     // Notify participants via socket
@@ -315,7 +323,10 @@ export const startLiveClass = async (req, res) => {
       liveClass.participants.forEach(participant => {
         socketService.sendToUser(participant.user, 'class_started', {
           classId: id,
-          message: 'Your live class has started!'
+          title: liveClass.title,
+          meetingUrl: liveClass.meetingUrl,
+          message: `Your live class "${liveClass.title}" has started! Click to join the video call.`,
+          instructor: liveClass.instructor.firstName + ' ' + liveClass.instructor.lastName
         });
       });
     }
@@ -323,7 +334,11 @@ export const startLiveClass = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Live class started successfully',
-      data: { liveClass }
+      data: { 
+        liveClass,
+        meetingUrl: liveClass.meetingUrl,
+        joinInstructions: 'Click the link to join the video call'
+      }
     });
   } catch (error) {
     console.error('Start live class error:', error);
@@ -350,7 +365,7 @@ export const endLiveClass = async (req, res) => {
     }
 
     // Check if user is instructor
-    if (liveClass.instructor.toString() !== req.user._id.toString()) {
+    if (liveClass.instructor.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Only instructor can end the class'
@@ -379,7 +394,7 @@ export const endLiveClass = async (req, res) => {
 // Get live classes by instructor
 export const getInstructorLiveClasses = async (req, res) => {
   try {
-    const instructorId = req.params.instructorId || req.user._id;
+    const instructorId = req.params.instructorId || req.user.id;
 
     const liveClasses = await LiveClass.find({ instructor: instructorId })
       .populate('participants.user', 'firstName lastName avatar')
@@ -405,7 +420,7 @@ export const getInstructorLiveClasses = async (req, res) => {
 // Get user's joined live classes
 export const getUserLiveClasses = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const liveClasses = await LiveClass.find({
       'participants.user': userId
@@ -434,7 +449,7 @@ export const getUserLiveClasses = async (req, res) => {
 export const joinVideoCall = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
     
     const liveClass = await LiveClass.findById(id);
     
@@ -445,12 +460,12 @@ export const joinVideoCall = async (req, res) => {
       });
     }
     
-    // Check if class is ongoing or scheduled to start within 5 minutes
+    // Check if class is live or scheduled to start within 5 minutes
     const now = new Date();
     const fiveMinutesBeforeStart = new Date(liveClass.scheduledAt);
     fiveMinutesBeforeStart.setMinutes(fiveMinutesBeforeStart.getMinutes() - 5);
     
-    if (liveClass.status !== 'ongoing' && now < fiveMinutesBeforeStart) {
+    if (liveClass.status !== 'live' && now < fiveMinutesBeforeStart) {
       return res.status(400).json({
         success: false,
         message: 'Video call is not available yet'
@@ -492,7 +507,7 @@ export const joinVideoCall = async (req, res) => {
     
     // If class was scheduled but instructor joins, start it
     if (liveClass.status === 'scheduled' && isInstructor) {
-      liveClass.status = 'ongoing';
+      liveClass.status = 'live';
       liveClass.actualStartTime = new Date();
     }
     
@@ -532,7 +547,7 @@ export const joinVideoCall = async (req, res) => {
 export const leaveVideoCall = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.id;
     
     const liveClass = await LiveClass.findById(id);
     
@@ -591,7 +606,7 @@ export const getUpcomingClasses = async (req, res) => {
     const now = new Date();
     const upcomingClasses = await LiveClass.find({
       scheduledDate: { $gte: now },
-      status: { $in: ['scheduled', 'ongoing'] }
+      status: { $in: ['scheduled', 'live'] }
     })
       .populate('instructor', 'firstName lastName avatar')
       .sort({ scheduledDate: 1 })

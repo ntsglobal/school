@@ -630,3 +630,65 @@ export const getUserCourses = async (req, res) => {
     });
   }
 };
+
+// Get teacher's courses
+export const getTeacherCourses = async (req, res) => {
+  try {
+    const teacherId = req.user.id; // Use MongoDB ObjectId, not Firebase UID
+
+    // Find courses where the user is instructor or co-instructor
+    const courses = await Course.find({
+      $or: [
+        { instructor: teacherId },
+        { coInstructors: { $in: [teacherId] } }
+      ],
+      isActive: true
+    })
+      .populate('instructor', 'firstName lastName avatar')
+      .populate('coInstructors', 'firstName lastName avatar')
+      .populate('enrolledStudents', 'firstName lastName avatar')
+      .sort({ createdAt: -1 });
+
+    // Add course statistics
+    const coursesWithStats = await Promise.all(
+      courses.map(async (course) => {
+        // Get progress statistics for this course
+        const progressStats = await Progress.aggregate([
+          { $match: { courseId: course._id } },
+          {
+            $group: {
+              _id: null,
+              totalStudents: { $addToSet: '$userId' },
+              avgProgress: { $avg: '$progress' },
+              totalLessonsCompleted: { $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] } }
+            }
+          }
+        ]);
+
+        const stats = progressStats[0] || { totalStudents: [], avgProgress: 0, totalLessonsCompleted: 0 };
+
+        return {
+          ...course.toObject(),
+          stats: {
+            enrolledCount: course.enrolledStudents.length,
+            activeStudents: stats.totalStudents.length,
+            avgProgress: Math.round(stats.avgProgress || 0),
+            totalLessonsCompleted: stats.totalLessonsCompleted
+          }
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: coursesWithStats
+    });
+
+  } catch (error) {
+    console.error('Get teacher courses error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
